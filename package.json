@@ -1,0 +1,18 @@
+{
+  "name": "reddit-insights",
+  "version": "1.0.0",
+  "description": "Ingest, analyze, and visualize Reddit subreddit activity.",
+  "type": "module",
+  "scripts": {
+    "ingest": "node scripts/reddit-memory-ingest.mjs",
+    "analyze": "node scripts/reddit-memory-analyze.mjs",
+    "ui": "node scripts/reddit-memory-ui.mjs",
+    "run": "node scripts/reddit-memory-run.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

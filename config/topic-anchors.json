@@ -1,0 +1,17 @@
+{
+  "_comment": "Topic anchors for subreddit analysis. Each anchor is [label, description_with_keywords]. Override per-subreddit by creating <subreddit>-anchors.json in this dir.",
+  "default": [
+    ["Local LLM setup", "local llm running setup hardware gpu cpu inference ollama llama.cpp vllm server deploy"],
+    ["Model comparison", "model comparison benchmark performance speed quality gpt llama mistral qwen gemma deepseek"],
+    ["Fine-tuning & training", "fine-tuning training lora qlora dataset adapter custom model sft"],
+    ["Quantization", "quantization gguf ggml q4 q8 int4 int8 compression size memory bits"],
+    ["Agents & tools", "agent tools function calling mcp autonomous workflow automation tool use"],
+    ["RAG & retrieval", "rag retrieval vector database embedding search context documents knowledge"],
+    ["Hardware & GPU", "gpu vram ram nvidia amd apple silicon mac rtx requirements memory bandwidth"],
+    ["Prompting & UX", "prompting chat interface ui ux system prompt template conversation"],
+    ["Safety & alignment", "safety alignment censorship guardrails rlhf bias moderation filtering"],
+    ["Coding & dev tools", "code coding programming development ide copilot debugger tools software"],
+    ["News & releases", "released announced launched new model weights open source update"],
+    ["Community & meta", "subreddit community rules moderation discussion meta opinion"]
+  ]
+}
