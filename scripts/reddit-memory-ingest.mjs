@@ -36,7 +36,7 @@ const STORAGE_FILE = join(STORAGE_DIR, `${SUBREDDIT}.json`);
 
 const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID || "3HSxjDpyDoDePeegOw8v_w";
 const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET || "X5B8wdAHm2Q4VyCA62uv2ScVwLPmeA";
-const UA = "chatgpt-memory-insights/0.1 (by /u/NexGenBot)";
+const UA = "reddit-insights/0.1 (by /u/NexGenBot)";
 
 let cachedToken = null;
 let tokenExpiry = 0;

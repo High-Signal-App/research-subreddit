@@ -3,7 +3,7 @@
 // Secrets: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET (set via wrangler secret put)
 
 const REDDIT_BASE = "https://www.reddit.com";
-const UA = "chatgpt-memory-insights/0.1 (by /u/sarthak_research)";
+const UA = "reddit-insights/0.1 (by /u/sarthak_research)";
 
 let cachedToken = null;
 let tokenExpiry = 0;
