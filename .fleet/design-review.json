@@ -49,7 +49,7 @@
       }
     ],
     "projectCheck": {
-      "command": "node --check scripts/reddit-research-studio.mjs && node --check scripts/reddit-memory-ui.mjs && git diff --check && openspec validate overhaul-reddit-research-workbench --strict",
+      "command": "node --check scripts/reddit-research-studio.mjs && node --check scripts/reddit-memory-ui.mjs && npm run test:display && git diff --check && openspec validate compact-all-community-reports --strict && openspec validate overhaul-reddit-research-workbench --strict",
       "status": "pass"
     },
     "critique": {
@@ -68,12 +68,12 @@
       "posture": "advisory",
       "findings": [
         "Final distillation detector reported 8 advisory-only findings: 2 intentional overlay colors, 3 fluid display clamp endpoints, and 3 visualization microcell radii",
-        "Browser verification passed enriched LocalLLaMA and raw recruiting at 390, 768, and 1440 with no overflow or runtime errors; collection-time and cross-year score claims are absent"
+        "Browser verification passed strong LocalLLaMA, limited recruiting, and sparse IndiaPersonalFinance at 390, 768, and 1440 with no overflow or runtime errors; unsupported canon, topic, and comparison views are withheld"
       ]
     }
   },
   "ownerFeedback": {
     "decision": "keep",
-    "note": "Owner approved the top-content direction and asked for credibility over chart volume. The final distillation removes posting-time inference and cross-year score comparison, turns canon years into unscaled evidence context, consolidates repeated and emerging language, and keeps platform response secondary. Final audit remains 19/20 with zero P0/P1/P2 issues."
+    "note": "Owner approved the top-content direction and asked for credibility over chart volume, then requested all-community coverage with compact display data. The compact layer covers all 113 collected communities while visibly separating core, limited, and sparse analysis availability. Sparse corpora now use a source-only profile; unenriched corpora withhold topic comparisons. Final browser audit has zero P0/P1 issues."
   }
 }

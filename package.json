@@ -6,6 +6,8 @@
   "scripts": {
     "ingest": "node scripts/reddit-memory-ingest.mjs",
     "analyze": "node scripts/reddit-memory-analyze.mjs",
+    "build:display": "node scripts/build-display-data.mjs",
+    "test:display": "node scripts/build-display-data.test.mjs",
     "ui": "node scripts/reddit-memory-ui.mjs",
     "run": "node scripts/reddit-memory-run.mjs"
   },

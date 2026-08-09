@@ -50,6 +50,10 @@ findings back to source evidence. Generated reports and caches live under
 - Keep every collected community immediately searchable and explorable; richer
   analysis artifacts deepen the view but do not determine whether a dataset is
   considered ready.
+- Ship a compact display corpus for every readable community while keeping raw
+  Reddit payloads and embeddings outside the deployable product surface.
+- Grade available product material as strong, limited, or sparse without
+  presenting those grades as statistical confidence or historical completeness.
 - Surface durable canon themes, emerging contenders, fading historical winners,
   saturated current patterns, vocabulary shifts, and attention outliers.
 - Never use the mixed ranked/recent corpus to estimate total historical activity

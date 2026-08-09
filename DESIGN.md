@@ -130,6 +130,14 @@ reply-count percentiles. Every row links to Reddit and exposes age, topic, score
 reply metadata, and a relative candidate index. The index is explicitly not a
 prediction of quality or final rank.
 
+### Coverage state
+
+A compact state line follows the two-lens sampling contract. It names whether
+the selected corpus supports core views, limited historical interpretation, or
+source-only exploration. It separately states whether enriched topic assignments
+exist. Coverage language describes available product material, never confidence
+or representativeness.
+
 ### Story chapter
 
 Each chapter answers: what changed, why it matters, and what evidence supports

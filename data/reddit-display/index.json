@@ -1,0 +1,805 @@
+{
+  "schema": "reddit-insights.display.v1",
+  "communities": 113,
+  "records": 192216,
+  "bytes": 58908462,
+  "grades": {
+    "strong": 100,
+    "limited": 11,
+    "sparse": 2
+  },
+  "topicEnriched": 5,
+  "rows": [
+    {
+      "subreddit": "Accounting",
+      "records": 1933,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 439777
+    },
+    {
+      "subreddit": "AI_Agents",
+      "records": 1681,
+      "grade": "strong",
+      "topics": 1681,
+      "bytes": 865942
+    },
+    {
+      "subreddit": "androiddev",
+      "records": 1834,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 626423
+    },
+    {
+      "subreddit": "angular",
+      "records": 1392,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 425720
+    },
+    {
+      "subreddit": "artificial",
+      "records": 1783,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 528599
+    },
+    {
+      "subreddit": "austin",
+      "records": 1825,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 355110
+    },
+    {
+      "subreddit": "bangalore",
+      "records": 1642,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 470026
+    },
+    {
+      "subreddit": "bayarea",
+      "records": 1824,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 374320
+    },
+    {
+      "subreddit": "Berlin",
+      "records": 1746,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 369986
+    },
+    {
+      "subreddit": "boston",
+      "records": 1811,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 348004
+    },
+    {
+      "subreddit": "Business_Ideas",
+      "records": 1561,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 631806
+    },
+    {
+      "subreddit": "business",
+      "records": 1668,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 219276
+    },
+    {
+      "subreddit": "careeradvice",
+      "records": 1818,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 737145
+    },
+    {
+      "subreddit": "ChatGPT",
+      "records": 1896,
+      "grade": "strong",
+      "topics": 1896,
+      "bytes": 368989
+    },
+    {
+      "subreddit": "chennai",
+      "records": 1809,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 446440
+    },
+    {
+      "subreddit": "chicago",
+      "records": 1761,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 231641
+    },
+    {
+      "subreddit": "ClaudeAI",
+      "records": 1530,
+      "grade": "strong",
+      "topics": 1530,
+      "bytes": 579528
+    },
+    {
+      "subreddit": "cloud",
+      "records": 1371,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 365860
+    },
+    {
+      "subreddit": "coding",
+      "records": 1501,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 114523
+    },
+    {
+      "subreddit": "computervision",
+      "records": 1654,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 589519
+    },
+    {
+      "subreddit": "cscareerquestions",
+      "records": 1888,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 811641
+    },
+    {
+      "subreddit": "csharp",
+      "records": 1790,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 529381
+    },
+    {
+      "subreddit": "csMajors",
+      "records": 1931,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 516781
+    },
+    {
+      "subreddit": "cybersecurity",
+      "records": 1830,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 529975
+    },
+    {
+      "subreddit": "dataengineering",
+      "records": 1753,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 625948
+    },
+    {
+      "subreddit": "datascience",
+      "records": 1312,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 411874
+    },
+    {
+      "subreddit": "deeplearning",
+      "records": 1759,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 488872
+    },
+    {
+      "subreddit": "delhi",
+      "records": 1852,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 418253
+    },
+    {
+      "subreddit": "developersIndia",
+      "records": 1835,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 749685
+    },
+    {
+      "subreddit": "devops",
+      "records": 1703,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 692920
+    },
+    {
+      "subreddit": "django",
+      "records": 1653,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 513579
+    },
+    {
+      "subreddit": "dropshipping",
+      "records": 1769,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 556976
+    },
+    {
+      "subreddit": "Dubai",
+      "records": 1861,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 468543
+    },
+    {
+      "subreddit": "ecommerce",
+      "records": 1722,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 662313
+    },
+    {
+      "subreddit": "Entrepreneur",
+      "records": 1730,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 800843
+    },
+    {
+      "subreddit": "EntrepreneurRideAlong",
+      "records": 1791,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 977214
+    },
+    {
+      "subreddit": "EtsySellers",
+      "records": 1802,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 516751
+    },
+    {
+      "subreddit": "ExperiencedDevs",
+      "records": 1587,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 791895
+    },
+    {
+      "subreddit": "financialindependence",
+      "records": 1556,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 696641
+    },
+    {
+      "subreddit": "FinancialPlanning",
+      "records": 1773,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 685778
+    },
+    {
+      "subreddit": "flutterdev",
+      "records": 1792,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 680481
+    },
+    {
+      "subreddit": "freelance",
+      "records": 1436,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 499021
+    },
+    {
+      "subreddit": "gamedev",
+      "records": 1929,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 747087
+    },
+    {
+      "subreddit": "golang",
+      "records": 1747,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 583816
+    },
+    {
+      "subreddit": "hyderabad",
+      "records": 1757,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 369448
+    },
+    {
+      "subreddit": "india",
+      "records": 1914,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 456687
+    },
+    {
+      "subreddit": "IndianGaming",
+      "records": 1855,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 402787
+    },
+    {
+      "subreddit": "IndianStartups",
+      "records": 1685,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 693201
+    },
+    {
+      "subreddit": "IndianStreetBets",
+      "records": 1775,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 334463
+    },
+    {
+      "subreddit": "IndiaPersonalFinance",
+      "records": 36,
+      "grade": "sparse",
+      "topics": 0,
+      "bytes": 12783
+    },
+    {
+      "subreddit": "indiasocial",
+      "records": 1803,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 327260
+    },
+    {
+      "subreddit": "IndiaTech",
+      "records": 1631,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 254541
+    },
+    {
+      "subreddit": "indiehackers",
+      "records": 1170,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 548745
+    },
+    {
+      "subreddit": "investing",
+      "records": 1869,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 762357
+    },
+    {
+      "subreddit": "iOSProgramming",
+      "records": 1775,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 580662
+    },
+    {
+      "subreddit": "ITCareerQuestions",
+      "records": 1866,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 779119
+    },
+    {
+      "subreddit": "java",
+      "records": 1517,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 361763
+    },
+    {
+      "subreddit": "javascript",
+      "records": 1695,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 379455
+    },
+    {
+      "subreddit": "jobs",
+      "records": 1860,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 612363
+    },
+    {
+      "subreddit": "jobsearch",
+      "records": 1490,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 522162
+    },
+    {
+      "subreddit": "kolkata",
+      "records": 1733,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 349112
+    },
+    {
+      "subreddit": "kotlin",
+      "records": 1586,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 408778
+    },
+    {
+      "subreddit": "laravel",
+      "records": 1385,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 377243
+    },
+    {
+      "subreddit": "learnprogramming",
+      "records": 1918,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 747797
+    },
+    {
+      "subreddit": "LocalLLaMA",
+      "records": 1688,
+      "grade": "strong",
+      "topics": 1688,
+      "bytes": 614887
+    },
+    {
+      "subreddit": "london",
+      "records": 1828,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 334497
+    },
+    {
+      "subreddit": "losangeles",
+      "records": 1770,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 294308
+    },
+    {
+      "subreddit": "MachineLearning",
+      "records": 1764,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 724039
+    },
+    {
+      "subreddit": "marketing",
+      "records": 1523,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 519827
+    },
+    {
+      "subreddit": "midjourney",
+      "records": 1927,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 155808
+    },
+    {
+      "subreddit": "MLOps",
+      "records": 1349,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 487873
+    },
+    {
+      "subreddit": "mumbai",
+      "records": 1819,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 419338
+    },
+    {
+      "subreddit": "node",
+      "records": 1776,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 565527
+    },
+    {
+      "subreddit": "nyc",
+      "records": 1840,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 248646
+    },
+    {
+      "subreddit": "OpenAI",
+      "records": 1716,
+      "grade": "strong",
+      "topics": 1716,
+      "bytes": 371931
+    },
+    {
+      "subreddit": "options",
+      "records": 1846,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 758530
+    },
+    {
+      "subreddit": "personalfinance",
+      "records": 1970,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 912777
+    },
+    {
+      "subreddit": "PersonalFinanceCanada",
+      "records": 1905,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 783975
+    },
+    {
+      "subreddit": "php",
+      "records": 1591,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 466324
+    },
+    {
+      "subreddit": "povertyfinance",
+      "records": 1863,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 648249
+    },
+    {
+      "subreddit": "ProductManagement",
+      "records": 1632,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 611125
+    },
+    {
+      "subreddit": "programming",
+      "records": 1862,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 217467
+    },
+    {
+      "subreddit": "pune",
+      "records": 1667,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 358704
+    },
+    {
+      "subreddit": "python",
+      "records": 1782,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 701128
+    },
+    {
+      "subreddit": "rails",
+      "records": 1564,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 465091
+    },
+    {
+      "subreddit": "reactjs",
+      "records": 1832,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 585361
+    },
+    {
+      "subreddit": "RealEstate",
+      "records": 1771,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 776185
+    },
+    {
+      "subreddit": "RealEstateInvesting",
+      "records": 1555,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 597968
+    },
+    {
+      "subreddit": "recruiting",
+      "records": 1413,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 462075
+    },
+    {
+      "subreddit": "rust",
+      "records": 1827,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 599468
+    },
+    {
+      "subreddit": "SaaS",
+      "records": 1729,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 787236
+    },
+    {
+      "subreddit": "sales",
+      "records": 1768,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 676163
+    },
+    {
+      "subreddit": "sanfrancisco",
+      "records": 1772,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 289871
+    },
+    {
+      "subreddit": "seattle",
+      "records": 1793,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 321201
+    },
+    {
+      "subreddit": "selfhosted",
+      "records": 1764,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 769908
+    },
+    {
+      "subreddit": "shopify",
+      "records": 1771,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 610199
+    },
+    {
+      "subreddit": "SideProject",
+      "records": 1735,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 754974
+    },
+    {
+      "subreddit": "Singapore",
+      "records": 1885,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 310267
+    },
+    {
+      "subreddit": "singularity",
+      "records": 1691,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 291461
+    },
+    {
+      "subreddit": "smallbusiness",
+      "records": 1890,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 788969
+    },
+    {
+      "subreddit": "softwareengineering",
+      "records": 1348,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 349173
+    },
+    {
+      "subreddit": "StableDiffusion",
+      "records": 1901,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 500998
+    },
+    {
+      "subreddit": "startups",
+      "records": 1859,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 877098
+    },
+    {
+      "subreddit": "stocks",
+      "records": 1893,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 952677
+    },
+    {
+      "subreddit": "sveltejs",
+      "records": 1540,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 470494
+    },
+    {
+      "subreddit": "swift",
+      "records": 1684,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 463109
+    },
+    {
+      "subreddit": "techcareers",
+      "records": 164,
+      "grade": "sparse",
+      "topics": 0,
+      "bytes": 50580
+    },
+    {
+      "subreddit": "technology",
+      "records": 1942,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 195134
+    },
+    {
+      "subreddit": "toronto",
+      "records": 1736,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 248049
+    },
+    {
+      "subreddit": "UKPersonalFinance",
+      "records": 1897,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 873987
+    },
+    {
+      "subreddit": "vuejs",
+      "records": 1462,
+      "grade": "limited",
+      "topics": 0,
+      "bytes": 385666
+    },
+    {
+      "subreddit": "wallstreetbets",
+      "records": 1901,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 332246
+    },
+    {
+      "subreddit": "webdev",
+      "records": 1850,
+      "grade": "strong",
+      "topics": 0,
+      "bytes": 602266
+    }
+  ]
+}

@@ -14,11 +14,14 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { createServer } from "node:http";
 import { join, dirname } from "node:path";
+import { gunzipSync } from "node:zlib";
 import { renderResearchStudio } from "./reddit-research-studio.mjs";
 
 const DEFAULT_SUBREDDIT = process.argv[2] || "LocalLLaMA";
 const PORT = parseInt(process.env.PORT || "7424", 10);
-const DATA_DIR = join(process.cwd(), "data", "reddit-memory");
+const DATA_DIR = process.env.REDDIT_DATA_DIR || join(process.cwd(), "data", "reddit-memory");
+const DISPLAY_DIR = process.env.REDDIT_DISPLAY_DIR || join(process.cwd(), "data", "reddit-display");
+const CORPUS_CACHE = new Map();
 
 const PERIODS = [
   { key: "all", label: "All time", days: null },
@@ -36,20 +39,33 @@ function loadReport(subreddit, days) {
 }
 
 function availableSubreddits() {
-  if (!existsSync(DATA_DIR)) return [];
-  return readdirSync(DATA_DIR)
-    .map(file => file.match(/^(.+)\.json$/)?.[1])
-    .filter(name => name && !/-report(?:-|$)|-anchors$|-high-signal$/.test(name))
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  const names = new Set();
+  if (existsSync(DATA_DIR)) readdirSync(DATA_DIR).forEach(file => {
+    const name = file.match(/^(.+)\.json$/)?.[1];
+    if (name && !/-report(?:-|$)|-anchors$|-high-signal$/.test(name)) names.add(name);
+  });
+  if (existsSync(DISPLAY_DIR)) readdirSync(DISPLAY_DIR).forEach(file => {
+    const name = file.match(/^(.+)\.json(?:\.gz)?$/)?.[1];
+    if (name && name !== "index") names.add(name);
+  });
+  return [...names].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+}
+
+function loadCorpus(subreddit) {
+  if (CORPUS_CACHE.has(subreddit)) return CORPUS_CACHE.get(subreddit);
+  const compressedFile = join(DISPLAY_DIR, `${subreddit}.json.gz`);
+  const compactFile = join(DISPLAY_DIR, `${subreddit}.json`);
+  const rawFile = join(DATA_DIR, `${subreddit}.json`);
+  const file = existsSync(compressedFile) ? compressedFile : existsSync(compactFile) ? compactFile : rawFile;
+  if (!existsSync(file)) return { posts: [], coverage: null };
+  const payload = JSON.parse(file.endsWith(".gz") ? gunzipSync(readFileSync(file)).toString("utf8") : readFileSync(file, "utf8"));
+  const corpus = { posts: Array.isArray(payload) ? payload : (payload.posts || []), coverage: payload.coverage || null };
+  CORPUS_CACHE.set(subreddit, corpus);
+  return corpus;
 }
 
 function loadRawPosts(subreddit) {
-  const file = join(DATA_DIR, `${subreddit}.json`);
-  if (!existsSync(file)) return [];
-  const payload = JSON.parse(readFileSync(file, "utf8"));
-  const posts = Array.isArray(payload) ? payload : (payload.posts || []);
-  return posts;
+  return loadCorpus(subreddit).posts;
 }
 
 function startOfWeek(date) {
@@ -60,7 +76,8 @@ function startOfWeek(date) {
 }
 
 function buildCollectionReport(subreddit, days) {
-  const allPosts = loadRawPosts(subreddit).filter(post => Number.isFinite(Number(post.created_utc)));
+  const corpus = loadCorpus(subreddit);
+  const allPosts = corpus.posts.filter(post => Number.isFinite(Number(post.created_utc)));
   if (!allPosts.length) return null;
   const latestEpoch = Math.max(...allPosts.map(post => Number(post.created_utc)));
   const cutoff = days ? latestEpoch - days * 86400 : -Infinity;
@@ -150,12 +167,12 @@ function buildCollectionReport(subreddit, days) {
   }
 
   return {
-    subreddit, generatedAt: new Date().toISOString(), collectionOnly: true,
+    subreddit, generatedAt: new Date().toISOString(), collectionOnly: true, coverage: corpus.coverage,
     totals: { posts: posts.length, comments: posts.reduce((sum, post) => sum + commentCount(post), 0), texts: posts.length, dateRange: { start: dayKey(byDate[0]), end: dayKey(byDate.at(-1)) } },
     health: { totalPosts: posts.length, postsWithComments: replyPosts, totalComments: posts.reduce((sum, post) => sum + commentCount(post), 0), avgCommentsPerPost: posts.reduce((sum, post) => sum + commentCount(post), 0) / posts.length, answerRate: replyPosts / posts.length * 100, medianScore: scores[Math.floor(scores.length / 2)] || 0, topAuthors: [...authorCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10) },
     evolution: { totalMonths: months.length, analyzedMonths: months.length, phases: [...yearCounts.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([year, totalPosts]) => ({ period: year, dominantTopic: "Collected activity", dominantPct: 100, monthCount: months.filter(month => month.startsWith(year)).length, totalPosts })), topicEmergence: [], keyShifts: [], collectionOnly: true },
     periodComparisons: [], weeklyData, dailyData, topicBreakdown: null, topicBreakdownForChart: null, toneTrajectory: null, toneTrajectoryForChart: null, activityGrid,
-    engagementScatter: posts.map(post => ({ id: post.id || "", permalink: post.permalink || "", title: post.title || "Untitled post", text: `${post.title || ""} ${post.selftext || ""}`.trim().slice(0, 2000), score: score(post), comments: commentCount(post), upvoteRatio: Number(post.upvote_ratio || 0), topic: "Unclassified", flair: post.link_flair_text || "", created: Number(post.created_utc), date: dayKey(post) })), moderation: null, scoreHistogram,
+    engagementScatter: posts.map(post => ({ id: post.id || "", permalink: post.permalink || "", title: post.title || "Untitled post", text: `${post.title || ""} ${post.selftext || ""}`.trim().slice(0, 2000), score: score(post), comments: commentCount(post), upvoteRatio: Number(post.upvote_ratio || 0), topic: post.topic || "Unclassified", flair: post.link_flair_text || "", created: Number(post.created_utc), date: dayKey(post) })), moderation: null, scoreHistogram,
     commentKarma: { buckets: commentKarmaBuckets, totalStored: storedCommentCount, postsWithStoredComments },
     commentCorpus: { available: storedCommentCount > 0, totalStored: storedCommentCount, postsWithStoredComments },
     topContributors: [...authorCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15).map(([author, postCount]) => ({ author, posts: postCount, avgScore: Math.round((authorScores.get(author) || 0) / postCount), totalScore: authorScores.get(author) || 0, totalComments: authorReplies.get(author) || 0 })),
@@ -170,6 +187,7 @@ function loadReports(subreddit) {
     const collectionReport = buildCollectionReport(subreddit, p.days);
     const r = enrichedReport ? {
       ...enrichedReport,
+      coverage: collectionReport?.coverage || enrichedReport.coverage,
       commentKarma: collectionReport?.commentKarma || enrichedReport.commentKarma,
       commentCorpus: collectionReport?.commentCorpus || enrichedReport.commentCorpus,
     } : collectionReport;
