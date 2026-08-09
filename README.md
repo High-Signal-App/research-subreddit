@@ -37,6 +37,7 @@ Open `http://localhost:7424` after the UI step.
 - `scripts/reddit-memory-analyze.mjs` — cluster topics, tone, engagement, moderation, and generate reports
 - `scripts/reddit-memory-ui.mjs` — build and serve the static dashboard
 - `scripts/reddit-memory-run.mjs` — orchestrate ingest → analyze → UI
+- `scripts/enrich-relevant-communities.mjs` — rank and batch-enrich ready corpora without new Reddit ingestion
 - `scripts/reddit-proxy/` — Cloudflare Worker proxy for Reddit API
 - `config/topic-anchors.json` — default topic anchors
 - `data/reddit-memory/` — stored posts, reports, and embeddings cache

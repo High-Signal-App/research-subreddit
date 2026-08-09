@@ -771,13 +771,17 @@ async function main() {
   // 8. Engagement scatter data (score vs comments per post, with topic)
   console.log("  [8] Engagement scatter data...");
   const engagementScatter = posts.map((p, i) => ({
+    id: p.id || "",
+    permalink: p.permalink || "",
     score: p.score || 0,
     comments: p.num_comments || p.comments?.length || 0,
     upvoteRatio: p.upvote_ratio || 1,
     topic: postTopics[i] || 0,
     flair: p.link_flair_text || "none",
     title: (p.title || "").slice(0, 100),
+    text: `${p.title || ""} ${p.selftext || ""}`.trim().slice(0, 2000),
     created: p.created_utc,
+    date: new Date(p.created_utc * 1000).toISOString().slice(0, 10),
   }));
 
   // 9. Score distribution histogram (log-scale bins for power-law data)
