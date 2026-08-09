@@ -58,9 +58,13 @@ Configure the Pages project with:
 - Build output directory: `dist`
 - Node.js: 22 or newer
 
-The build creates `/r/<subreddit>/` for every compact community artifact.
+The build creates `/r/<subreddit>/` for every active community in the curated roster.
 Only `dist/` is uploaded; raw corpora, reports, caches, embeddings, and
 compact build inputs remain outside the deployed output.
+
+The visible community roster is curated in `config/community-roster.json`.
+Excluding a community removes it from navigation and static export without
+deleting its compact or raw research data.
 
 ## Project layout
 

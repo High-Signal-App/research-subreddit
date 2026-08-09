@@ -10,13 +10,16 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DISPLAY_DIR = join(ROOT, "data", "reddit-display");
 const DIST_DIR = join(ROOT, "dist");
 const INDEX_FILE = join(DISPLAY_DIR, "index.json");
+const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 
 if (!existsSync(INDEX_FILE)) {
   throw new Error("Missing compact display index. Run npm run build:display first.");
 }
 const index = JSON.parse(readFileSync(INDEX_FILE, "utf8"));
-const communities = index.rows.map(row => row.subreddit);
+const roster = JSON.parse(readFileSync(ROSTER_FILE, "utf8"));
+const excluded = new Set(roster.excludedCommunities || []);
+const communities = index.rows.map(row => row.subreddit).filter(community => !excluded.has(community));
 const defaultCommunity = communities.includes("LocalLLaMA") ? "LocalLLaMA" : communities[0];
 const temporaryDataDir = mkdtempSync(join(tmpdir(), "reddit-insights-pages-"));
 let server;

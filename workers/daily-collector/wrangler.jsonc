@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "reddit-insights-daily-collector",
+  "main": "worker.js",
+  "compatibility_date": "2026-08-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["17 2 * * *"]
+  },
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE",
+      "bucket_name": "reddit-insights-archive"
+    }
+  ],
+  "vars": {
+    "REDDIT_USER_AGENT": "reddit-insights-daily-collector/1.0"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
+  }
+}
