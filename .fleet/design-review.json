@@ -1,0 +1,79 @@
+{
+  "$schema": "fleet.design-review.v1",
+  "version": 1,
+  "project": "reddit-insights",
+  "target": "Reddit research dashboard",
+  "mode": "overhaul",
+  "register": "product",
+  "context": {
+    "product": "PRODUCT.md",
+    "design": "DESIGN.md"
+  },
+  "direction": {
+    "references": [
+      "contemporary data journalism",
+      "professional research studios",
+      "interactive scientific observatories"
+    ],
+    "probes": [
+      {
+        "id": "topic-river-studio",
+        "path": "artifacts/design/research-studio-probes/topic-river-studio.png"
+      },
+      {
+        "id": "radial-observatory",
+        "path": "artifacts/design/research-studio-probes/radial-observatory.png"
+      },
+      {
+        "id": "data-story-matrix",
+        "path": "artifacts/design/research-studio-probes/data-story-matrix.png"
+      }
+    ],
+    "selected": "data-story-matrix",
+    "approval": "delegated",
+    "before": ""
+  },
+  "evidence": {
+    "screenshots": [
+      {
+        "width": 390,
+        "path": "artifacts/design/after-390.png"
+      },
+      {
+        "width": 768,
+        "path": "artifacts/design/after-768.png"
+      },
+      {
+        "width": 1440,
+        "path": "artifacts/design/after-1440.png"
+      }
+    ],
+    "projectCheck": {
+      "command": "node --check scripts/reddit-research-studio.mjs && node --check scripts/reddit-memory-ui.mjs && npm run test:display && git diff --check && openspec validate compact-all-community-reports --strict && openspec validate overhaul-reddit-research-workbench --strict",
+      "status": "pass"
+    },
+    "critique": {
+      "score": 39,
+      "maximum": 40
+    },
+    "audit": {
+      "score": 19,
+      "maximum": 20
+    },
+    "unresolved": {
+      "p0": 0,
+      "p1": 0
+    },
+    "detector": {
+      "posture": "advisory",
+      "findings": [
+        "Final distillation detector reported 8 advisory-only findings: 2 intentional overlay colors, 3 fluid display clamp endpoints, and 3 visualization microcell radii",
+        "Browser verification passed strong LocalLLaMA, limited recruiting, and sparse IndiaPersonalFinance at 390, 768, and 1440 with no overflow or runtime errors; unsupported canon, topic, and comparison views are withheld"
+      ]
+    }
+  },
+  "ownerFeedback": {
+    "decision": "keep",
+    "note": "Owner approved the top-content direction and asked for credibility over chart volume, then requested all-community coverage with compact display data. The compact layer covers all 113 collected communities while visibly separating core, limited, and sparse analysis availability. Sparse corpora now use a source-only profile; unenriched corpora withhold topic comparisons. Final browser audit has zero P0/P1 issues."
+  }
+}

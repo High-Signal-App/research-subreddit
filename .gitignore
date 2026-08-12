@@ -1,7 +1,12 @@
 node_modules/
+dist/
+.wrangler/
 data/reddit-memory/cache/
+data/reddit-memory/*.json
 data/reddit-memory/*-report*.html
 data/reddit-memory/*-report*.json
+artifacts/
+.codex/
 *.log
 .DS_Store
 .env
