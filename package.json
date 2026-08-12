@@ -8,6 +8,8 @@
     "analyze": "node scripts/reddit-memory-analyze.mjs",
     "build:display": "node scripts/build-display-data.mjs",
     "build:pages": "node scripts/build-pages.mjs",
+    "test:collector": "node --test workers/daily-collector/worker.test.mjs",
+    "check:collector": "npx --yes wrangler@4.120.0 types workers/daily-collector/worker-configuration.d.ts --config workers/daily-collector/wrangler.jsonc --include-runtime false --check && npm run test:collector && npx --yes wrangler@4.120.0 deploy --dry-run --config workers/daily-collector/wrangler.jsonc",
     "test:display": "node scripts/build-display-data.test.mjs",
     "ui": "node scripts/reddit-memory-ui.mjs",
     "run": "node scripts/reddit-memory-run.mjs"

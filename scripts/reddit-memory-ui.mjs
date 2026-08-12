@@ -21,7 +21,11 @@ const DEFAULT_SUBREDDIT = process.argv[2] || "LocalLLaMA";
 const PORT = parseInt(process.env.PORT || "7424", 10);
 const DATA_DIR = process.env.REDDIT_DATA_DIR || join(process.cwd(), "data", "reddit-memory");
 const DISPLAY_DIR = process.env.REDDIT_DISPLAY_DIR || join(process.cwd(), "data", "reddit-display");
+const ROSTER_FILE = join(process.cwd(), "config", "community-roster.json");
 const CORPUS_CACHE = new Map();
+const EXCLUDED_COMMUNITIES = new Set(
+  existsSync(ROSTER_FILE) ? JSON.parse(readFileSync(ROSTER_FILE, "utf8")).excludedCommunities || [] : [],
+);
 
 const PERIODS = [
   { key: "all", label: "All time", days: null },
@@ -48,7 +52,7 @@ function availableSubreddits() {
     const name = file.match(/^(.+)\.json(?:\.gz)?$/)?.[1];
     if (name && name !== "index") names.add(name);
   });
-  return [...names].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  return [...names].filter(name => !EXCLUDED_COMMUNITIES.has(name)).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 }
 
 function loadCorpus(subreddit) {
