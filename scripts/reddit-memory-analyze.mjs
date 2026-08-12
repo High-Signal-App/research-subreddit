@@ -16,6 +16,7 @@ import { pipeline } from "@huggingface/transformers";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { createHash } from "node:crypto";
+import { summarizeTopicAssignments } from "./topic-clustering.mjs";
 
 const SUBREDDIT = process.argv[2] || "LocalLLaMA";
 const PERIOD_DAYS = (() => {
@@ -216,19 +217,11 @@ async function clusterTopics(texts, embeddings) {
     }
     return { topicIdx: best, sim: bestSim };
   });
-  return TOPIC_ANCHORS.map(([label], idx) => {
-    const members = assignments.map((a, i) => ({ ...a, i })).filter(a => a.topicIdx === idx);
-    // Show the most representative examples (highest similarity to anchor), not just the first ones
-    const sorted = [...members].sort((a, b) => b.sim - a.sim);
-    const topExamples = sorted.slice(0, 5).map(m => ({ text: texts[m.i].slice(0, 150), sim: m.sim }));
-    return {
-      label, count: members.length,
-      avgSim: members.reduce((s, a) => s + a.sim, 0) / Math.max(1, members.length),
-      topSim: sorted[0]?.sim || 0,
-      examples: topExamples.map(e => e.text),
-      exampleSims: topExamples.map(e => e.sim),
-    };
-  }).filter(t => t.count > 0).sort((a, b) => b.count - a.count);
+  return summarizeTopicAssignments(
+    TOPIC_ANCHORS.map(([label]) => label),
+    texts,
+    assignments,
+  );
 }
 
 // Assign each post to a topic (by embedding post title against topic anchors)

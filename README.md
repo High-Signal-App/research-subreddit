@@ -75,6 +75,7 @@ deleting its compact or raw research data.
 - `scripts/enrich-relevant-communities.mjs` — rank and batch-enrich ready corpora without new Reddit ingestion
 - `scripts/build-display-data.mjs` — generate gzip-compressed display artifacts for every collected community
 - `scripts/build-pages.mjs` — pre-render the observatory for Cloudflare Pages
+- `scripts/topic-clustering.performance.test.mjs` — guard topic summarization cost and output at representative corpus sizes
 - `scripts/reddit-proxy/` — Cloudflare Worker proxy for Reddit API
 - `config/topic-anchors.json` — default topic anchors
 - `data/reddit-memory/` — stored posts, reports, and embeddings cache
