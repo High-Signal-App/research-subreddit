@@ -12,6 +12,7 @@ const DIST_DIR = join(ROOT, "dist");
 const INDEX_FILE = join(DISPLAY_DIR, "index.json");
 const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
+const ORIGIN = "https://reddit-insights.highsignal.app";
 
 if (!existsSync(INDEX_FILE)) {
   throw new Error("Missing compact display index. Run npm run build:display first.");
@@ -24,11 +25,26 @@ const defaultCommunity = communities.includes("LocalLLaMA") ? "LocalLLaMA" : com
 const temporaryDataDir = mkdtempSync(join(tmpdir(), "reddit-insights-pages-"));
 let server;
 
-function staticHtml(html) {
+function staticHtml(html, community) {
   const dynamicNavigation = "location.href='?'+new URLSearchParams({subreddit:community,period})";
   const staticNavigation = "location.href='/r/'+encodeURIComponent(community)+'/'";
   if (!html.includes(dynamicNavigation)) throw new Error("Could not locate community navigation in rendered HTML.");
-  return html.replace(dynamicNavigation, staticNavigation);
+  const canonicalUrl = `${ORIGIN}/r/${encodeURIComponent(community)}/`;
+  const description = `Inspect the collected Reddit evidence, topic history, and attention patterns for r/${community}.`;
+  const structuredData = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `Reddit Insights — r/${community}`,
+    url: canonicalUrl,
+    description,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Reddit Insights",
+      url: ORIGIN,
+    },
+  }).replaceAll("<", "\\u003c");
+  const metadata = `<meta name="description" content="${description}"><link rel="canonical" href="${canonicalUrl}"><meta property="og:type" content="website"><meta property="og:site_name" content="Reddit Insights"><meta property="og:title" content="Reddit Insights — r/${community}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonicalUrl}"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Reddit Insights — r/${community}"><meta name="twitter:description" content="${description}"><script type="application/ld+json">${structuredData}</script>`;
+  return html.replace(dynamicNavigation, staticNavigation).replace("</head>", `${metadata}</head>`);
 }
 
 async function waitForServer() {
@@ -57,7 +73,7 @@ try {
   for (const community of communities) {
     const response = await fetch(`http://127.0.0.1:${PORT}/?subreddit=${encodeURIComponent(community)}&period=all`);
     if (!response.ok) throw new Error(`Failed to render r/${community}: HTTP ${response.status}`);
-    const html = staticHtml(await response.text());
+    const html = staticHtml(await response.text(), community);
     const output = join(DIST_DIR, "r", community, "index.html");
     mkdirSync(dirname(output), { recursive: true });
     writeFileSync(output, html);
@@ -65,7 +81,20 @@ try {
   }
 
   writeFileSync(join(DIST_DIR, "index.html"), defaultHtml);
-  writeFileSync(join(DIST_DIR, "404.html"), defaultHtml);
+  writeFileSync(join(DIST_DIR, "404.html"), defaultHtml.replace("</head>", '<meta name="robots" content="noindex"></head>'));
+  writeFileSync(join(DIST_DIR, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
+  writeFileSync(
+    join(DIST_DIR, "sitemap.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${communities.map(community => `<url><loc>${ORIGIN}/r/${encodeURIComponent(community)}/</loc></url>`).join("")}</urlset>\n`,
+  );
+  writeFileSync(join(DIST_DIR, "llms.txt"), `# Reddit Insights\n\nEvidence-bounded research views over collected Reddit community activity.\n\n- ${ORIGIN}/index.md\n- ${ORIGIN}/llms-full.txt\n- ${ORIGIN}/api/ai\n`);
+  writeFileSync(join(DIST_DIR, "llms-full.txt"), `# Reddit Insights\n\nReddit Insights publishes static, evidence-bounded research views for the communities in its disclosed collection roster. Each /r/{subreddit}/ page summarizes collected topic history and source-linked attention patterns. Coverage does not imply platform-wide completeness, and observations are not causal claims.\n`);
+  writeFileSync(join(DIST_DIR, "index.md"), `# Reddit Insights\n\nReddit Insights is a static research observatory for collected subreddit evidence, topic history, and attention patterns. Collection coverage is disclosed and does not imply platform-wide completeness or causal evidence.\n`);
+  mkdirSync(join(DIST_DIR, "api"), { recursive: true });
+  writeFileSync(
+    join(DIST_DIR, "api", "ai.json"),
+    `${JSON.stringify({ name: "Reddit Insights", url: ORIGIN, description: "Evidence-bounded research views over collected Reddit community activity.", collections: [{ pathTemplate: "/r/{subreddit}/", description: "One static community research view" }] }, null, 2)}\n`,
+  );
   writeFileSync(join(DIST_DIR, "_headers"), `/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
