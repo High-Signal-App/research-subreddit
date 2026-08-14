@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  static-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:pages
+      - name: Verify search discovery output
+        run: |
+          test -s dist/robots.txt
+          test -s dist/sitemap.xml
+          test -s dist/r/LocalLLaMA/index.html
+          grep -Fq 'https://reddit-insights.highsignal.app/sitemap.xml' dist/robots.txt
+          grep -Fq 'https://reddit-insights.highsignal.app/r/LocalLLaMA/' dist/sitemap.xml
+          grep -Fq 'rel="canonical" href="https://reddit-insights.highsignal.app/r/LocalLLaMA/"' dist/r/LocalLLaMA/index.html
