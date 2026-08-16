@@ -19,7 +19,8 @@
  */
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { dirname } from "node:path";
+import { memoryDir, storageFile } from "./lib/paths.mjs";
 
 const SUBREDDIT = process.argv[2] || "LocalLLaMA";
 const SORT = process.argv[3] || "hot";
@@ -29,8 +30,8 @@ const MONTHS_BACK = (() => {
   const idx = process.argv.indexOf("--months");
   return idx >= 0 ? parseInt(process.argv[idx + 1], 10) : 0;
 })();
-const STORAGE_DIR = join(process.cwd(), "data", "reddit-memory");
-const STORAGE_FILE = join(STORAGE_DIR, `${SUBREDDIT}.json`);
+const STORAGE_DIR = memoryDir();
+const STORAGE_FILE = storageFile(SUBREDDIT);
 
 // ─── Reddit OAuth (client_credentials, no username/password) ──────────────
 
