@@ -23,6 +23,7 @@
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { memoryDir, storageFile } from "./lib/paths.mjs";
 
 const SUBREDDIT = process.argv[2];
 if (!SUBREDDIT) {
@@ -31,8 +32,8 @@ if (!SUBREDDIT) {
 }
 
 const SCRIPTS_DIR = join(process.cwd(), "scripts");
-const DATA_DIR = join(process.cwd(), "data", "reddit-memory");
-const STORAGE_FILE = join(DATA_DIR, `${SUBREDDIT}.json`);
+const DATA_DIR = memoryDir();
+const STORAGE_FILE = storageFile(SUBREDDIT);
 const REPORT_FILE = join(DATA_DIR, `${SUBREDDIT}-report.json`);
 
 const POSTS_ONLY = process.argv.includes("--posts-only");

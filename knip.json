@@ -1,0 +1,10 @@
+{
+  "entry": [
+    "scripts/*.mjs",
+    "scripts/lib/*.mjs",
+    "workers/daily-collector/worker.js"
+  ],
+  "project": ["scripts/**/*.mjs", "workers/**/*.js"],
+  "ignore": ["data/**", "dist/**", "node_modules/**", "**/*.test.mjs"]
+}
+

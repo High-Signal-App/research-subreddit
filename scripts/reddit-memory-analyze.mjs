@@ -14,8 +14,10 @@
 
 import { pipeline } from "@huggingface/transformers";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { createHash } from "node:crypto";
+import { dirname } from "node:path";
+import { embeddingCacheFile, storageFile } from "./lib/paths.mjs";
+import { isQuestion } from "./lib/questions.mjs";
+import { cosine as cos, hashText } from "./lib/vectors.mjs";
 import { summarizeTopicAssignments } from "./topic-clustering.mjs";
 
 const SUBREDDIT = process.argv[2] || "LocalLLaMA";
@@ -23,9 +25,9 @@ const PERIOD_DAYS = (() => {
   const arg = process.argv.find(a => a.startsWith("--days="));
   return arg ? parseInt(arg.split("=")[1], 10) : null;
 })();
-const STORAGE_FILE = join(process.cwd(), "data", "reddit-memory", `${SUBREDDIT}.json`);
-const CACHE_DIR = join(process.cwd(), "data", "reddit-memory", "cache");
-const CACHE_FILE = join(CACHE_DIR, `${SUBREDDIT}-embeddings.json`);
+const STORAGE_FILE = storageFile(SUBREDDIT);
+const CACHE_FILE = embeddingCacheFile(SUBREDDIT);
+const CACHE_DIR = dirname(CACHE_FILE);
 const USE_CACHE = !process.argv.includes("--no-cache");
 
 // ─── Embedding (with disk cache) ──────────────────────────────────────────
@@ -65,10 +67,6 @@ function saveCache() {
   }
   writeFileSync(CACHE_FILE, JSON.stringify(serializable));
   console.log(`  embedding cache: ${Object.keys(embeddingCache).length} entries saved`);
-}
-
-function hashText(text) {
-  return createHash("sha256").update(text).digest("hex").slice(0, 16);
 }
 
 async function embed(texts) {
@@ -112,32 +110,6 @@ async function embed(texts) {
   }
   console.log();
   return out;
-}
-
-function cos(a, b) { let d = 0; for (let i = 0; i < a.length; i++) d += a[i] * b[i]; return d; }
-
-// ─── Question vs announcement filter ──────────────────────────────────────
-
-const QUESTION_PATTERNS = [
-  /\?\s*$/,                    // ends with ?
-  /^(how|what|why|where|when|which|who|can|could|should|would|is|are|do|does|did|will|has|have)\b/i,
-  /\b(?:anyone|any way|how do|how can|how to|what's the best|recommend|suggestion|advice|help me)\b/i,
-  /\b(?:looking for|searching for|need (?:a|an|some|help))\b/i,
-];
-
-const ANNOUNCEMENT_PATTERNS = [
-  /^(released|announced|launched|update|new|breaking|just (?:released|finished|posted|got))\b/i,
-  /\b(?:now available|weights released|open sourced|just dropped|is out|is live)\b/i,
-];
-
-function isQuestion(text) {
-  if (text.length < 15) return false;
-  // Strong question signal
-  if (text.trim().endsWith("?")) return true;
-  // Check patterns
-  const isQ = QUESTION_PATTERNS.some(p => p.test(text));
-  const isA = ANNOUNCEMENT_PATTERNS.some(p => p.test(text));
-  return isQ && !isA;
 }
 
 // ─── Analysis functions ───────────────────────────────────────────────────
