@@ -32,9 +32,41 @@ jobs:
       - run: npm run build:pages
       - name: Verify search discovery output
         run: |
+          # Take the canary from the index rather than naming a community. A
+          # hardcoded one breaks every time the published roster changes, which
+          # is exactly how r/LocalLLaMA broke this job when it was unpublished.
+          community=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('data/reddit-display/index.json','utf8')).rows[0].subreddit)")
+          echo "Canary community: $community"
           test -s dist/robots.txt
           test -s dist/sitemap.xml
-          test -s dist/r/LocalLLaMA/index.html
+          test -s "dist/r/$community/index.html"
           grep -Fq 'https://reddit-insights.highsignal.app/sitemap.xml' dist/robots.txt
-          grep -Fq 'https://reddit-insights.highsignal.app/r/LocalLLaMA/' dist/sitemap.xml
-          grep -Fq 'rel="canonical" href="https://reddit-insights.highsignal.app/r/LocalLLaMA/"' dist/r/LocalLLaMA/index.html
+          grep -Fq "https://reddit-insights.highsignal.app/r/$community/" dist/sitemap.xml
+          grep -Fq "rel=\"canonical\" href=\"https://reddit-insights.highsignal.app/r/$community/\"" "dist/r/$community/index.html"
+      - name: Verify the exported set matches the index
+        run: |
+          node -e "
+            const fs = require('fs');
+            const index = JSON.parse(fs.readFileSync('data/reddit-display/index.json', 'utf8'));
+            const roster = JSON.parse(fs.readFileSync('config/community-roster.json', 'utf8'));
+            const excluded = new Set(roster.excludedCommunities);
+            // dist/r carries the indexed communities minus the roster
+            // exclusions -- not every indexed community, so this is not a
+            // straight count of index.communities.
+            const expected = index.rows.map(row => row.subreddit).filter(name => !excluded.has(name));
+            const actual = fs.readdirSync('dist/r', { withFileTypes: true })
+              .filter(entry => entry.isDirectory())
+              .map(entry => entry.name);
+            const missing = expected.filter(name => !actual.includes(name));
+            const extra = actual.filter(name => !expected.includes(name));
+            if (missing.length || extra.length) {
+              throw new Error('export drifted from the index. missing: ' + missing.join(',') + ' extra: ' + extra.join(','));
+            }
+            // An unpublished artifact must never reach the deployed bundle.
+            for (const entry of index.unpublished || []) {
+              if (actual.includes(entry.subreddit)) {
+                throw new Error('unpublished community was still exported: ' + entry.subreddit);
+              }
+            }
+            console.log(expected.length + ' exported communities match the index; ' + (index.unpublished || []).length + ' unpublished correctly absent');
+          "
