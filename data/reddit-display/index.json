@@ -1,14 +1,23 @@
 {
   "schema": "reddit-insights.display.v1",
-  "communities": 113,
-  "records": 192216,
-  "bytes": 58908462,
+  "communities": 112,
+  "records": 190528,
+  "bytes": 58293575,
   "grades": {
-    "strong": 100,
+    "strong": 99,
     "limited": 11,
     "sparse": 2
   },
-  "topicEnriched": 5,
+  "topicEnriched": 4,
+  "skipped": [],
+  "unpublished": [
+    {
+      "file": "LocalLLaMA.json.gz",
+      "subreddit": "LocalLLaMA",
+      "bytes": 614887,
+      "reason": "unpublished: no raw corpus for this artifact on this machine"
+    }
+  ],
   "rows": [
     {
       "subreddit": "Accounting",
@@ -457,13 +466,6 @@
       "grade": "strong",
       "topics": 0,
       "bytes": 747797
-    },
-    {
-      "subreddit": "LocalLLaMA",
-      "records": 1688,
-      "grade": "strong",
-      "topics": 1688,
-      "bytes": 614887
     },
     {
       "subreddit": "london",
