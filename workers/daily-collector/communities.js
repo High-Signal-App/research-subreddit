@@ -52,7 +52,6 @@ export const COMMUNITIES = [
   "kotlin",
   "laravel",
   "learnprogramming",
-  "LocalLLaMA",
   "MachineLearning",
   "marketing",
   "midjourney",
