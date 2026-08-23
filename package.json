@@ -23,7 +23,10 @@
     "quality:cycles": "knip --cycles --no-config-hints",
     "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run quality:duplication && npm run quality:cycles",
     "ui": "node scripts/reddit-memory-ui.mjs",
-    "run": "node scripts/reddit-memory-run.mjs"
+    "run": "node scripts/reddit-memory-run.mjs",
+    "deploy:pages": "npm run build:pages && npx --yes wrangler@4.120.0 pages deploy dist --project-name reddit-insights --branch main --commit-hash \"$(git rev-parse HEAD)\"",
+    "deploy:proxy": "npx --yes wrangler@4.120.0 deploy --config scripts/reddit-proxy/wrangler.jsonc --tag \"$(git rev-parse HEAD)\"",
+    "deploy:collector": "npm run check:collector && npx --yes wrangler@4.120.0 deploy --config workers/daily-collector/wrangler.jsonc --tag \"$(git rev-parse HEAD)\""
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1"
