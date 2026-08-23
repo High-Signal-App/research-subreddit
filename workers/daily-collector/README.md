@@ -22,8 +22,8 @@ so rerunning the same UTC date replaces rather than duplicates that snapshot.
    `npx wrangler secret put REDDIT_CLIENT_ID`
    and `npx wrangler secret put REDDIT_CLIENT_SECRET`.
 4. Validate with `npm run check:collector`.
-5. Explicitly deploy with
-   `npx wrangler deploy --config workers/daily-collector/wrangler.jsonc`.
+5. From the repository root, explicitly deploy with
+   `npm run deploy:collector`, which deploys with the immutable Git SHA tag.
 
 Cloudflare may require enabling an R2 subscription even while usage remains
 inside its free allowance.
