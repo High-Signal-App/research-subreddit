@@ -13,6 +13,7 @@ const INDEX_FILE = join(DISPLAY_DIR, "index.json");
 const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = "https://reddit-insights.highsignal.app";
+const footerScripts = `<script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" defer></script>`;
 
 if (!existsSync(INDEX_FILE)) {
   throw new Error("Missing compact display index. Run npm run build:display first.");
@@ -44,7 +45,10 @@ function staticHtml(html, community) {
     },
   }).replaceAll("<", "\\u003c");
   const metadata = `<meta name="description" content="${description}"><link rel="canonical" href="${canonicalUrl}"><meta property="og:type" content="website"><meta property="og:site_name" content="Reddit Insights"><meta property="og:title" content="Reddit Insights — r/${community}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonicalUrl}"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Reddit Insights — r/${community}"><meta name="twitter:description" content="${description}"><script type="application/ld+json">${structuredData}</script><script>!function(t,e){var o,n,a,r;function s(e){(o=t._phq=t._phq||[]).push([].slice.call(e))}o=t.posthog=function(e,n){s([e,n])},o.__loaded||(a=e.createElement("script"),a.type="text/javascript",a.async=!0,a.crossOrigin="anonymous",a.src="https://us.i.posthog.com/array.js",r=e.getElementsByTagName("script")[0],r.parentNode.insertBefore(a,r),o.__loaded=!0),t.posthog.init("phc_qgiAarw4Co4pw9fz3Fxj4UJaHmqzFetqs4JrXhGc35Nd",{api_host:"https://us.i.posthog.com",person_profiles:"always",capture_pageview:!1,autocapture:!1,loaded:function(){t.posthog.capture("page_view",{project_id:"reddit-insights"})}})}(window,document);</script><script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/y6bwkyh4qb";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y6bwkyh4qb");window.clarity("set","project_id","reddit-insights");</script>`;
-  return html.replace(dynamicNavigation, staticNavigation).replace("</head>", `${metadata}</head>`);
+  return html
+    .replace(dynamicNavigation, staticNavigation)
+    .replace("</head>", `${metadata}</head>`)
+    .replace("</body>", `${footerScripts}</body>`);
 }
 
 async function waitForServer() {
