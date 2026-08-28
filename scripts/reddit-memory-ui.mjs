@@ -1853,6 +1853,10 @@ refreshHighSignalExport(initialSubreddit, initialReports.all);
 console.log(`  High Signal candidate export refreshed for ${initialSubreddit}`);
 
 // Serve
+if (process.env.REDDIT_RENDER_ONLY === "1") {
+  console.log("  Render-only mode complete");
+  process.exit(0);
+}
 const server = createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const requestedSubreddit = url.searchParams.get("subreddit") || initialSubreddit;

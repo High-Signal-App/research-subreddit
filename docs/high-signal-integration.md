@@ -2,9 +2,11 @@
 
 ## Product boundary
 
-Reddit Insights is the system of record for longitudinal Reddit research. It
-owns raw collection, historical coverage, subreddit-specific topic models,
-cross-period comparison, source inspection, and research methodology.
+High Signal owns the canonical forward daily raw archive in private R2. Reddit
+Insights owns longitudinal analysis, subreddit-specific topic models,
+cross-period comparison, source inspection, and research methodology. It may
+retain its older research corpora, but it must not create a second forward raw
+archive.
 
 High Signal is the downstream synthesis product. It should consume only compact,
 qualified Reddit observations and combine them with independent sources. It
@@ -26,6 +28,15 @@ Version 1 exports directly source-backed high-engagement posts. Historical topic
 shifts remain research findings in the dashboard until the analyzer can attach
 representative post IDs to each topic-period observation. This avoids presenting
 unrelated popular posts as evidence for a trend.
+
+## Daily archive import
+
+`npm run import:high-signal -- --events <events.jsonl.zst> --pointer <latest.json>
+--output-dir <temporary-directory> [--render <subreddit>]` converts the bounded
+daily event stream into derived gzip display corpora. The output declares its
+exact archive window and `rawArchiveDuplicated: false`; it is disposable and
+belongs under `artifacts/`, not the checked-in corpus. `--render` performs a
+render-only UI build and exits without starting the local server.
 
 ## Future High Signal adapter
 
