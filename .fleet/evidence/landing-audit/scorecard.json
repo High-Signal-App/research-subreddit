@@ -1,0 +1,57 @@
+{
+  "$schema": "fleet.landing-audit.v1",
+  "project": "reddit-insights",
+  "priority": "P4",
+  "decision": "Hold",
+  "auditedAt": "2026-08-29",
+  "candidateUrl": "https://mirror-fossil-cash-honey.trycloudflare.com/",
+  "productionUrl": "https://reddit-insights.highsignal.app/",
+  "releaseState": "The latest static observatory, 93 community routes, machine-readable discovery surfaces, social card, runtime repair, and shared footer composition are qualified through a temporary Cloudflare tunnel. They are not deployed by this audit.",
+  "implementationAction": "preserve",
+  "migrationCandidate": false,
+  "gates": {
+    "contentPurpose": {
+      "score": 99,
+      "status": "pass",
+      "evidence": "The first viewport states exactly what the product can support: compare an available ranked historical canon with an inferred recent candidate pool to see what became prominent, persisted, or is breaking through. It discloses record counts, inferred boundaries, topic-enrichment availability, and that the archive is not a census. The source-linked evidence and methodology preserve the remaining historical-data limitation instead of claiming whole-subreddit evolution. The fallback homepage now opens the enriched r/AI_Agents view rather than an arbitrary alphabetic community."
+    },
+    "designQuality": {
+      "score": 97,
+      "status": "pass",
+      "evidence": "The existing Top-Content Observatory is a distinctive data-journalism system rather than a generic card dashboard. Its opening research contract, canon/current comparison, contender ranking, recent-pool analysis, and source evidence form a coherent narrative on desktop and a usable linear sequence on mobile. Exact 390 and 1440 pixel checks found zero document overflow or runtime errors and exactly one project strip plus one Ask AI footer."
+    },
+    "seo": {
+      "score": 100,
+      "status": "pass",
+      "evidence": "The latest candidate passes all 15 checks with no failures or warnings: exact title and 125-character description, canonical, complete Open Graph and Twitter metadata, a stable 1200 by 630 raster social card, CollectionPage and WebSite JSON-LD, clean heading hierarchy, approximately 4,117 server-rendered words, and no broken internal links."
+    },
+    "geo": {
+      "score": 100,
+      "status": "pass",
+      "evidence": "The latest candidate reports S-tier 100% in the Fleet agent-index audit. Source now exports /api/ai with the required catalog contract, llms.txt, llms-full.txt, homepage Markdown, robots policy, a 93-route sitemap, and an agent-readable Markdown counterpart for every public community route. A templated catalog surface covers the community collection without duplicating 93 entries."
+    },
+    "performance": {
+      "score": 98,
+      "status": "pass",
+      "evidence": "PSI Swarm completed 4 of 4 coverage profiles with weighted LCP 781 ms, CLS 0, and TBT 12 ms. LCP measured 2.13 seconds on slow mobile, 985 ms on mid mobile, 561 ms on fast mobile, and 347 ms on desktop, with no actionable Lighthouse opportunities. The broken PostHog loader was replaced by a lightweight fleet event call, eliminating the candidate runtime exception."
+    }
+  },
+  "verification": {
+    "passed": [
+      "22/22 Node test cases plus 112 published-artifact and 26 enrichment-script checks",
+      "workspace typecheck",
+      "configured Biome lint scope",
+      "93-route static production export",
+      "93/93 route Markdown counterparts",
+      "latest-candidate browser checks at 390 and 1440 pixels",
+      "latest-candidate SEO audit",
+      "latest-candidate GEO audit",
+      "latest-source PSI Swarm coverage profile",
+      "one project strip and one Ask AI footer"
+    ],
+    "advisories": [
+      "npm audit reports two high-severity findings inherited through sharp from @huggingface/transformers; no upstream fix is currently available. The static public export does not execute this image-processing dependency in the browser."
+    ]
+  },
+  "minimumObserved": 97
+}
