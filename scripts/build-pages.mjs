@@ -15,6 +15,39 @@ const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
 const footerScripts = `<script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" data-compose="false" crossorigin="anonymous" defer></script>`;
+// The studio renderer opens its main column with this section; the search
+// panel is injected directly above it so it is the first thing in <main>.
+const SEARCH_ANCHOR = `<main><section class="studio-opening canon-opening" id="canon">`;
+const SEARCH_ANCHOR_TAIL = SEARCH_ANCHOR.replace("<main>", "");
+const searchStyles = `<style>
+  #post-search{border:1px solid var(--rule);background:var(--panel);border-radius:var(--radius-panel);padding:20px;margin:0 0 22px}
+  #post-search h2{font-size:var(--heading-xs);margin:0 0 4px}
+  #post-search .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  #post-search .post-search-deck{color:var(--quiet);font-size:var(--text-sm);margin:0 0 14px;max-width:70ch}
+  #post-search-form{display:flex;gap:8px;flex-wrap:wrap}
+  #post-search-input{flex:1 1 18rem;min-width:0;background:var(--studio-deep);border:1px solid var(--rule-strong);border-radius:var(--radius-control);color:var(--ink);padding:10px 12px;font:inherit;font-size:var(--text-control)}
+  #post-search-input::placeholder{color:var(--quiet)}
+  #post-search-input:focus-visible,#post-search button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  #post-search button{background:var(--cobalt);color:var(--ink);border:0;border-radius:var(--radius-control);padding:10px 20px;font:inherit;font-size:var(--text-control);font-weight:600;cursor:pointer}
+  #post-search-status{color:var(--quiet);font-size:var(--text-analytical);margin:12px 0 0}
+  #post-search-results{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px;max-height:32rem;overflow-y:auto}
+  .post-search-hit{border-top:1px solid var(--rule);padding-top:10px}
+  .post-search-hit a{color:var(--cyan);text-decoration:none;font-weight:600;font-size:var(--text-body)}
+  .post-search-hit a:hover{text-decoration:underline}
+  .post-search-hit p{color:var(--quiet);font-size:var(--text-analytical);margin:4px 0 0}
+</style>`;
+
+/** Post-level search shell. The controller module fills it in once JavaScript runs. */
+function searchSection(community) {
+  const label = community.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll('"', "&quot;");
+  return `<section id="post-search" data-community="${label}" aria-labelledby="post-search-heading">
+  <h2 id="post-search-heading">Find a post in r/${label}</h2>
+  <p class="post-search-deck">Ranked over every collected post title and body in this community. The corpus chunk is fetched once, then searched entirely in your browser — nothing you type leaves this page.</p>
+  <form id="post-search-form" role="search"><label class="visually-hidden" for="post-search-input">Search collected r/${label} posts</label><input id="post-search-input" type="search" name="q" placeholder="e.g. self-hosting costs" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form>
+  <p id="post-search-status" role="status">Type a phrase to rank every collected post in this community.</p>
+  <ul id="post-search-results"></ul>
+</section>`;
+}
 
 if (!existsSync(INDEX_FILE)) {
   throw new Error("Missing compact display index. Run npm run build:display first.");
@@ -31,6 +64,7 @@ function staticHtml(html, community) {
   const dynamicNavigation = "location.href='?'+new URLSearchParams({subreddit:community,period})";
   const staticNavigation = "location.href='/r/'+encodeURIComponent(community)+'/'";
   if (!html.includes(dynamicNavigation)) throw new Error("Could not locate community navigation in rendered HTML.");
+  if (!html.includes(SEARCH_ANCHOR)) throw new Error("Could not locate the main content anchor for the post search panel.");
   const canonicalUrl = `${ORIGIN}/r/${encodeURIComponent(community)}/`;
   const description = `Compare the ranked canon and inferred recent candidate pool for r/${community}, with source links and sampling limits disclosed.`;
   const structuredData = JSON.stringify({
@@ -48,8 +82,9 @@ function staticHtml(html, community) {
   const metadata = `<meta name="description" content="${description}"><link rel="canonical" href="${canonicalUrl}"><meta property="og:type" content="website"><meta property="og:site_name" content="Reddit Insights"><meta property="og:title" content="Reddit Insights — r/${community}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonicalUrl}"><meta property="og:image" content="${SOCIAL_IMAGE}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Reddit Insights — r/${community}"><meta name="twitter:description" content="${description}"><meta name="twitter:image" content="${SOCIAL_IMAGE}"><script type="application/ld+json">${structuredData}</script><script>fetch("https://us.i.posthog.com/i/v0/e/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({api_key:"phc_qgiAarw4Co4pw9fz3Fxj4UJaHmqzFetqs4JrXhGc35Nd",event:"page_view",distinct_id:crypto.randomUUID(),properties:{project_id:"reddit-insights"}}),keepalive:true}).catch(()=>{});</script><script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/y6bwkyh4qb";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y6bwkyh4qb");window.clarity("set","project_id","reddit-insights");</script>`;
   return html
     .replace(dynamicNavigation, staticNavigation)
-    .replace("</head>", `${metadata}</head>`)
-    .replace("</body>", `${footerScripts}</body>`);
+    .replace("</head>", `${metadata}${searchStyles}</head>`)
+    .replace(SEARCH_ANCHOR, `<main>${searchSection(community)}${SEARCH_ANCHOR_TAIL}`)
+    .replace("</body>", `<script type="module" src="/assets/browser/search-client.mjs"></script>${footerScripts}</body>`);
 }
 
 async function waitForServer() {
@@ -118,13 +153,56 @@ try {
   writeFileSync(join(DIST_DIR, "api", "ai"), agentCatalog);
   writeFileSync(join(DIST_DIR, "api", "ai.json"), agentCatalog);
   copyFileSync(join(ROOT, "assets", "social-card.png"), join(DIST_DIR, "social-card.png"));
+
+  // Ship the search runtime as plain ES modules and mirror the source layout so
+  // the relative import inside search-client.mjs resolves unchanged.
+  for (const [from, to] of [
+    [join(ROOT, "scripts", "lib", "search-ranking.mjs"), join(DIST_DIR, "assets", "lib", "search-ranking.mjs")],
+    [join(ROOT, "scripts", "browser", "search-client.mjs"), join(DIST_DIR, "assets", "browser", "search-client.mjs")],
+  ]) {
+    mkdirSync(dirname(to), { recursive: true });
+    copyFileSync(from, to);
+  }
+
+  // Publish the per-community corpus chunks the browser search fetches. They
+  // are already gzipped on disk, so they are copied byte-for-byte and declared
+  // as gzip-encoded in _headers rather than re-compressed here.
+  const dataDir = join(DIST_DIR, "data");
+  mkdirSync(dataDir, { recursive: true });
+  const publishedRows = index.rows.filter(row => !excluded.has(row.subreddit));
+  for (const row of publishedRows) {
+    const chunk = join(DISPLAY_DIR, `${row.subreddit}.json.gz`);
+    if (!existsSync(chunk)) throw new Error(`Missing display chunk for published community r/${row.subreddit}.`);
+    copyFileSync(chunk, join(dataDir, `${row.subreddit}.json.gz`));
+  }
+  writeFileSync(
+    join(dataDir, "index.json"),
+    `${JSON.stringify({
+      schema: index.schema,
+      communities: publishedRows.length,
+      records: publishedRows.reduce((sum, row) => sum + row.records, 0),
+      rows: publishedRows.map(row => ({ subreddit: row.subreddit, records: row.records, grade: row.grade, bytes: row.bytes, chunk: `/data/${encodeURIComponent(row.subreddit)}.json.gz` })),
+    }, null, 2)}\n`,
+  );
+
   writeFileSync(join(DIST_DIR, "_headers"), `/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   X-Frame-Options: DENY
+
+/assets/*
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=86400, immutable
+
+/data/*
+  Cache-Control: public, max-age=86400, immutable
+
+/data/*.json.gz
+  Content-Type: application/json; charset=utf-8
+  Content-Encoding: gzip
 `);
-  console.log(`Built ${communities.length} static community routes in dist/.`);
+  console.log(`Built ${communities.length} static community routes and ${publishedRows.length} searchable corpus chunks in dist/.`);
 } finally {
   if (server && !server.killed) server.kill("SIGTERM");
   rmSync(temporaryDataDir, { recursive: true, force: true });

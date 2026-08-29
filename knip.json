@@ -2,6 +2,7 @@
   "entry": [
     "scripts/*.mjs",
     "scripts/lib/*.mjs",
+    "scripts/browser/*.mjs",
     "workers/daily-collector/worker.js"
   ],
   "project": ["scripts/**/*.mjs", "workers/**/*.js"],

@@ -43,6 +43,16 @@ jobs:
           grep -Fq 'https://reddit-insights.highsignal.app/sitemap.xml' dist/robots.txt
           grep -Fq "https://reddit-insights.highsignal.app/r/$community/" dist/sitemap.xml
           grep -Fq "rel=\"canonical\" href=\"https://reddit-insights.highsignal.app/r/$community/\"" "dist/r/$community/index.html"
+          # The browser post search needs its corpus chunk, the shared runtime,
+          # and the panel on the page -- a page without all three ships a search
+          # box that can never return a result.
+          test -s "dist/data/$community.json.gz"
+          test -s dist/data/index.json
+          test -s dist/assets/lib/search-ranking.mjs
+          test -s dist/assets/browser/search-client.mjs
+          grep -Fq '<section id="post-search"' "dist/r/$community/index.html"
+      - name: Verify the search payload matches the published index
+        run: node --test scripts/build-search-assets.test.mjs
       - name: Verify the exported set matches the index
         run: |
           node -e "
