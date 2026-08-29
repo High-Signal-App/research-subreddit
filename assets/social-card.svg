@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#060913"/>
+      <stop offset="1" stop-color="#0b1120"/>
+    </linearGradient>
+    <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M56 0H0V56" fill="none" stroke="#263653" stroke-width="1" opacity=".55"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#field)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="32" y="32" width="1136" height="566" rx="22" fill="none" stroke="#3b4f73"/>
+  <circle cx="92" cy="95" r="9" fill="#3677ff"/>
+  <circle cx="122" cy="95" r="9" fill="#8b5cf6"/>
+  <circle cx="152" cy="95" r="9" fill="#b7ea32"/>
+  <text x="184" y="105" fill="#f6f7fb" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">Reddit Insights</text>
+  <text x="80" y="236" fill="#23c6d7" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="3">TOP-CONTENT OBSERVATORY</text>
+  <text x="78" y="342" fill="#f6f7fb" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="72" font-weight="900">What rises. What persists.</text>
+  <text x="78" y="426" fill="#f6f7fb" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="72" font-weight="900">What breaks through.</text>
+  <line x1="80" x2="1120" y1="494" y2="494" stroke="#3b4f73"/>
+  <text x="80" y="548" fill="#a9b5ca" font-family="Arial, Helvetica, sans-serif" font-size="24">Ranked canon + recent candidates · source-linked · sampling disclosed</text>
+  <text x="1120" y="548" fill="#74849f" font-family="Arial, Helvetica, sans-serif" font-size="20" text-anchor="end">reddit-insights.highsignal.app</text>
+</svg>
