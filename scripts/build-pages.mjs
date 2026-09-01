@@ -14,7 +14,7 @@ const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
-const footerScripts = `<script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" data-compose="false" crossorigin="anonymous" defer></script>`;
+const footerScripts = `<script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
 const SEARCH_ANCHOR = `<main><section class="studio-opening canon-opening" id="canon">`;
