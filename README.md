@@ -88,3 +88,20 @@ Customize topic anchors per subreddit by creating `data/reddit-memory/<subreddit
 
 - The first analysis run downloads embedding models and caches embeddings in `data/reddit-memory/cache/`.
 - The proxy worker is optional; use it if you need to route Reddit API calls through Cloudflare.
+
+
+### Shareability repair — 2026-09-07
+
+Community navigation now binds only to picker buttons. The post-search panel
+also carries `data-community`; binding the whole panel caused clicks inside it
+to navigate and reset the query. A regression test exercises the actual click
+binding and confirms that the panel stays inert while picker navigation works.
+Contender age bands are now explicitly dated to the latest collected post,
+rather than presented as current ages.
+
+Validation: `npm test`, the 93-community static export, and all five exported
+search-asset checks pass. Browser interaction was unavailable during the final
+check. Still required: approved deployment, a search that retains its query and
+returns source-linked results, keyboard community selection, and a mobile layout
+check. The observed LocalLLaMA URL served AI_Agents fallback content; inspect
+unpublished-community routing before qualifying the public directory.
