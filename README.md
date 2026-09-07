@@ -59,8 +59,11 @@ Configure the Pages project with:
 - Node.js: 22 or newer
 
 The build creates `/r/<subreddit>/` for every active community in the curated roster.
-Only `dist/` is uploaded; raw corpora, reports, caches, embeddings, and
-compact build inputs remain outside the deployed output.
+Only `dist/` is uploaded. It includes the curated communities’ compact gzip
+search chunks under `/data/`, containing the collected post titles, bodies and
+source links used by browser search. Raw research directories, reports, caches
+and embeddings remain outside the deployed output; excluded communities are
+not copied into the public search bundle.
 
 The visible community roster is curated in `config/community-roster.json`.
 Excluding a community removes it from navigation and static export without
@@ -99,13 +102,17 @@ binding and confirms that the panel stays inert while picker navigation works.
 Contender age bands are now explicitly dated to the latest collected post,
 rather than presented as current ages.
 
-Validation: `npm test`, the 93-community static export, and all five exported
-search-asset checks pass. Browser interaction was unavailable during the final
-check. Still required: approved deployment, a search that retains its query and
-returns source-linked results, keyboard community selection, and a mobile layout
-check. The observed LocalLLaMA URL served AI_Agents fallback content. The static
-export now supplies a dedicated unavailable page with links only to published
-communities, instead of substituting the default dashboard. All six exported
-asset/routing tests pass, as does the full `npm run quality` command (including
-the corrected navigation-test types). Verify the deployed HTTP 404 response
-and recovery links before qualifying the public directory.
+The repair is deployed at source `4e63e2b4abbefda34981e45d5dad35cc33c3b794`.
+[Release acceptance](docs/release-2026-09-07.md) records matching custom-domain
+assets, retained search queries and source-linked results, keyboard community
+selection, dated age bands, mobile layout, and a real unavailable-community
+HTTP 404 with recovery. The 93-community export and all six exported search/
+routing checks pass; exact source CI is green.
+
+Independent public web access resolved the sampled original Reddit permalink
+and matched its title, topic and visible opening excerpt against the retained
+mobile screenshot. The headless-browser network block is recorded separately. Scoped historical source-linked discovery
+is qualified as an experiment with medium confidence. Missing capture/retrieval
+provenance and unaudited full-corpus fidelity still limit longitudinal claims.
+Preserve inactive status: no new collection, enrichment, proxy/collector deployment
+or database work is implied by this static release.

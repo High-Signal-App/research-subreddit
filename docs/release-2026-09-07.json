@@ -1,0 +1,83 @@
+{
+  "observedAt": "2026-09-07",
+  "sourceRevision": "4e63e2b4abbefda34981e45d5dad35cc33c3b794",
+  "ciRun": 34103184551,
+  "deploymentId": "c574318f-38da-4148-b7a5-6fbe5eb4c15b",
+  "releaseUrl": "https://c574318f.reddit-insights.pages.dev",
+  "customDomain": "https://reddit-insights.highsignal.app",
+  "rollbackDeploymentId": "d3c71859-d576-435c-b976-8bac0b8ff5ac",
+  "wranglerVersion": "4.85.0 (existing installed fallback; repository pin 4.120.0 unavailable in offline cache)",
+  "export": {
+    "communities": 93,
+    "files": 293,
+    "searchChunks": 93,
+    "searchRecords": 156682,
+    "assetRoutingTests": 6
+  },
+  "customDomainMatchesLocalAndImmutable": {
+    "/r/AI_Agents/": "185214ca8f5f62d5b9dc03c715b4cf009333e153735eb86aac8bb12d72761467",
+    "/assets/browser/search-client.mjs": "cefafd744be8fc369f12eeaeeffd4813bf916c5b0eb1f268c00d418142e5a8cd",
+    "/404.html": "a67038ff1fe47c98be576cf2b7d445955d092d99d634005ff9e2530408477fe6"
+  },
+  "browser": [
+    {
+      "width": 1280,
+      "query": "agents",
+      "queryRetained": true,
+      "resultCount": 25,
+      "source": "https://reddit.com/r/AI_Agents/comments/1s7xuw7/you_can_now_give_an_ai_agent_its_own_email_phone/",
+      "sourceTitle": "You can now give an AI agent its own email, phone number, computer, wallet, and voice. Here's every tool in the stack",
+      "sourceCheck": {
+        "status": 200,
+        "url": "https://www.reddit.com/r/AI_Agents/comments/1s7xuw7/you_can_now_give_an_ai_agent_its_own_email_phone/",
+        "title": "",
+        "bodyStart": "You've been blocked by network security.\nIf you think you've been blocked by mistake, file a ticket below and we'll look into it.\nFile a ticket"
+      },
+      "date": "Age bands are measured as of 2026-08-08, not today. The newest-post pool is filtered within those bands, then ranked by score and reply-count percentiles. Posts newer than 7 days are withheld when enough mature candidates exist.",
+      "provenanceLimitVisible": true,
+      "noResults": true,
+      "keyboardCommunity": "ChatGPT",
+      "unavailableCommunity": "LocalLLaMA",
+      "unavailableStatus": 404,
+      "recovery": "AI_Agents",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "query": "agents",
+      "queryRetained": true,
+      "resultCount": 25,
+      "source": "https://reddit.com/r/AI_Agents/comments/1s7xuw7/you_can_now_give_an_ai_agent_its_own_email_phone/",
+      "sourceTitle": "You can now give an AI agent its own email, phone number, computer, wallet, and voice. Here's every tool in the stack",
+      "date": "Age bands are measured as of 2026-08-08, not today. The newest-post pool is filtered within those bands, then ranked by score and reply-count percentiles. Posts newer than 7 days are withheld when enough mature candidates exist.",
+      "provenanceLimitVisible": true,
+      "noResults": true,
+      "keyboardCommunity": "ChatGPT",
+      "unavailableCommunity": "LocalLLaMA",
+      "unavailableStatus": 404,
+      "recovery": "AI_Agents",
+      "overflow": false,
+      "errors": []
+    }
+  ],
+  "sourceAccessLimit": "Headless Chrome showed Reddit network-security block despite HTTP200; independent public web access by the coordinating reviewer resolved the exact permalink and matched title, topic and visible opening excerpt. Full-corpus fidelity remains unaudited.",
+  "independentSourceReview": {
+    "reviewer": "coordinating agent",
+    "url": "https://www.reddit.com/r/AI_Agents/comments/1s7xuw7/you_can_now_give_an_ai_agent_its_own_email_phone/",
+    "access": "resolved via public web",
+    "titleMatches": true,
+    "topicMatches": "agent primitives",
+    "visibleOpeningExcerptMatches": true,
+    "comparisonEvidence": "Retained 390px screenshot and original public web source"
+  },
+  "qualification": {
+    "scope": "historical source-linked discovery experiment",
+    "confidence": "medium",
+    "limits": [
+      "Incomplete capture and retrieval provenance",
+      "Full-corpus fidelity not audited",
+      "Not live signals or complete Reddit history"
+    ]
+  }
+}
