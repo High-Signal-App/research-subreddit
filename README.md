@@ -103,5 +103,9 @@ Validation: `npm test`, the 93-community static export, and all five exported
 search-asset checks pass. Browser interaction was unavailable during the final
 check. Still required: approved deployment, a search that retains its query and
 returns source-linked results, keyboard community selection, and a mobile layout
-check. The observed LocalLLaMA URL served AI_Agents fallback content; inspect
-unpublished-community routing before qualifying the public directory.
+check. The observed LocalLLaMA URL served AI_Agents fallback content. The static
+export now supplies a dedicated unavailable page with links only to published
+communities, instead of substituting the default dashboard. All six exported
+asset/routing tests pass, as does the full `npm run quality` command (including
+the corrected navigation-test types). Verify the deployed HTTP 404 response
+and recovery links before qualifying the public directory.

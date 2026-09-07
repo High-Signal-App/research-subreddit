@@ -63,3 +63,13 @@ test("the search runtime is published and wired into every community page", { sk
     assert.match(page, /<script type="module" src="\/assets\/browser\/search-client\.mjs"><\/script>/, `r/${name} is missing the search controller`);
   }
 });
+
+
+test("missing communities show an unavailable page without substituted analysis", { skip }, () => {
+  const page = readFileSync(join(DIST, "404.html"), "utf8");
+  assert.match(page, /This community page is unavailable/);
+  assert.match(page, /name="robots" content="noindex"/);
+  assert.doesNotMatch(page, /id="post-search"|id="canon"|Candidate index/);
+  for (const name of published) assert.ok(page.includes(`/r/${encodeURIComponent(name)}/`));
+  for (const name of excluded) assert.ok(!page.includes(`/r/${encodeURIComponent(name)}/`));
+});

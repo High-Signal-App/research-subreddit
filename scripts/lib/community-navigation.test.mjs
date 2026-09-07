@@ -14,11 +14,14 @@ test("search panel clicks do not acquire community navigation", () => {
     /document\.querySelectorAll\('([^']*data-community[^']*)'\)\.forEach\(button=>button\.addEventListener\('click',\(\)=>navigate\(button\.dataset\.community,CURRENT_PERIOD\)\)\);/,
   );
   assert.ok(binding, "community click binding must remain testable");
+  /** @type {string[][]} */
   const navigations = [];
+  /** @param {string} tag */
   const node = (tag) => ({
     tag,
     dataset: { community: "AI_Agents" },
-    listeners: {},
+    listeners: /** @type {Record<string, () => void>} */ ({}),
+    /** @param {string} type @param {() => void} fn */
     addEventListener(type, fn) {
       this.listeners[type] = fn;
     },
@@ -27,6 +30,7 @@ test("search panel clicks do not acquire community navigation", () => {
   const search = node("section");
   vm.runInNewContext(binding[0], {
     document: {
+      /** @param {string} selector */
       querySelectorAll(selector) {
         return [picker, search].filter(
           (item) => !selector.startsWith("button") || item.tag === "button",
@@ -34,6 +38,7 @@ test("search panel clicks do not acquire community navigation", () => {
       },
     },
     CURRENT_PERIOD: "all",
+    /** @param {string[]} args */
     navigate: (...args) => navigations.push(args),
   });
   assert.equal(

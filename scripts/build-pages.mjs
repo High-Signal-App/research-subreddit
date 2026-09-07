@@ -125,7 +125,9 @@ try {
   }
 
   writeFileSync(join(DIST_DIR, "index.html"), defaultHtml);
-  writeFileSync(join(DIST_DIR, "404.html"), defaultHtml.replace("</head>", '<meta name="robots" content="noindex"></head>'));
+  // Missing/unpublished communities must not masquerade as the default corpus.
+  const unavailableHtml = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Community unavailable · Reddit Insights</title><style>body{margin:0;background:#10151e;color:#edf1f7;font:16px/1.6 system-ui,sans-serif}main{max-width:56rem;margin:8vh auto;padding:24px}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15}p{max-width:65ch;color:#b5bfce}a{color:#78baff}a:focus-visible{outline:2px solid currentColor;outline-offset:4px}ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:12px;list-style:none;padding:0}li a{display:block;padding:10px 12px;border:1px solid #354256;border-radius:8px;overflow-wrap:anywhere}</style></head><body><main><p>Reddit Insights</p><h1>This community page is unavailable.</h1><p>The requested page is missing or has not been published. No other community's analysis has been substituted. Choose one of the available collected communities below.</p><p><a href="/">Open the default research view</a></p><h2>Available communities</h2><ul>${communities.map(community => `<li><a href="/r/${encodeURIComponent(community)}/">r/${community.replaceAll("&", "&amp;").replaceAll("<", "&lt;")}</a></li>`).join("")}</ul></main></body></html>`;
+  writeFileSync(join(DIST_DIR, "404.html"), unavailableHtml);
   writeFileSync(join(DIST_DIR, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
   writeFileSync(
     join(DIST_DIR, "sitemap.xml"),
