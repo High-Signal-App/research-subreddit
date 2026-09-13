@@ -2,6 +2,8 @@
 
 Ingest, analyze, and visualize Reddit subreddit activity.
 
+Product direction: [product requirements](PRD.md).
+
 ## Setup
 
 ```bash
