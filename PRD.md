@@ -1,9 +1,8 @@
 # Reddit Insights — product requirements
 
-Status: final product definition, 2026-09-13. The static observatory is shipped
-and the canonical 99-community archive exists in High Signal. Continuous
-acceptance and the full Reddit Insights consumer workflow still need current
-verification.
+Status: final product definition, 2026-09-13. The static observatory is shipped.
+The proven 99-community archive implementation currently runs from High Signal
+and must move to Reddit Insights before this ownership model is complete.
 
 ## Product outcome
 
@@ -21,11 +20,14 @@ a complete history of Reddit.
 
 - The repository already ships a static, source-linked observatory over 93
   active communities and a retained local research corpus.
-- High Signal already owns the canonical forward archive for 99 communities in
-  private R2. Reddit Insights imports its bounded event export and must not run
-  a second raw collector or keep a second raw copy.
-- The local Cloudflare collector is an unused scaffold. It is retained as
-  reference code, not as an activation path.
+- High Signal currently hosts the proven 99-community archive implementation.
+  This is migration input, not the target ownership model.
+- Reddit Insights will own the only production collector, roster, private R2
+  archive, schema, retention policy, and deletion path. High Signal and
+  Mentionpilot will read bounded exports from Reddit Insights.
+- The local Cloudflare collector is an incomplete scaffold. It must not be
+  deployed as the replacement without the proven packing, resume, redaction,
+  and verification behavior.
 - The existing corpus has mixed ranked and recent sampling. It supports the
   current Top-content Observatory, not claims about total historical activity.
 
@@ -34,10 +36,9 @@ a complete history of Reddit.
 The Fleet operator manages the roster, reviews run health and gaps, resumes
 failures, and controls expansion. Researchers search a community and date
 range, inspect source evidence, compare periods, and export a reproducible
-slice. Reddit Insights and Mentionpilot consume approved private exports; High
-Signal uses the same archive for its bounded attention events. Each consumer
-applies its own product logic, and a Reddit observation remains one source, not
-a corroborated signal.
+slice. Reddit Insights publishes approved private exports for Mentionpilot and
+High Signal. Each consumer applies its own product logic, and a Reddit
+observation remains one source, not a corroborated signal.
 
 The core workflow is:
 
@@ -55,10 +56,10 @@ The core workflow is:
 
 Collection uses Reddit's official OAuth Data API only. The product does not
 scrape Reddit HTML, use unauthenticated endpoints, rotate client IDs to evade
-limits, or collect private communities. The existing archive may operate only
-while its use and retention remain approved and its deletion path can remove
-deleted content from raw data, derived exports, indexes, and caches. Roster or
-retention expansion stays off until those conditions are reverified.
+limits, or collect private communities. The Reddit Insights archive may operate
+only while its use and retention remain approved and its deletion path can
+remove deleted content from raw data, derived exports, indexes, and caches.
+Roster or retention expansion stays off until those conditions are reverified.
 
 The initial operating assumption is Reddit's documented free-access limit of
 100 queries per minute per OAuth client. Throughput is paced from Reddit's
@@ -69,9 +70,11 @@ references are the [Reddit Data API Wiki](https://support.reddithelp.com/hc/en-u
 
 ### Roster
 
-The canonical machine-readable roster remains High Signal's
-`reddit_communities.json`; Reddit Insights consumes a generated projection so
-the collector and research UI cannot drift into two hand-maintained lists.
+The canonical machine-readable roster lives in Reddit Insights. During
+migration, the proven High Signal `reddit_communities.json` is imported once
+into `config/community-roster.json`; after cutover, High Signal consumes the
+Reddit Insights projection so the collector and research UI cannot drift into
+two hand-maintained lists.
 Each entry has a stable subreddit name, priority, state, added date, last
 successful collection time, and optional pause reason. Case-insensitive
 duplicates are invalid.
@@ -120,8 +123,9 @@ Reddit's reported rate budget and does not add client IDs to increase it.
 
 ### Storage and serving
 
-There is one raw archive: High Signal's private R2 bucket. Reddit Insights does
-not provision another bucket or D1 body/search index. The daily archive stores
+There is one raw archive: Reddit Insights' private R2 bucket. High Signal and
+Mentionpilot receive no raw bucket credentials and keep no raw copies. Reddit
+Insights does not create a D1 body/search duplicate. The daily archive stores
 five bounded objects under an immutable run, attempt, and UTC date prefix:
 
 ```text
@@ -144,20 +148,21 @@ trained dictionary. The existing 112-community benchmark reduced 268,077,889
 bytes of normalized rows to 66,105,037 bytes. Zstandard 22 was smaller than
 Zstandard 19, Brotli 11, and XZ/LZMA2 `-9e`, while decoding the result in 0.38
 seconds. Compression runs asynchronously on the archive runner; the Cloudflare
-Worker runtime only provides gzip/deflate streams, so the product does not add
-a WASM Zstandard dependency to a request path.
+Worker runtime [only provides gzip/deflate compression streams](https://developers.cloudflare.com/workers/runtime-apis/web-standards/#compression-streams),
+so the product does not add a WASM Zstandard dependency to a request path.
 
-The current 99-community production receipt is the planning baseline: 31,569
-comments retained from 50,270 observed, 2,589 Reddit requests, zero retries,
-and 5,381,724 compressed bytes for posts, retained comments, and consumer
-events. At that rate, one year is approximately 1.96 GB before small manifests
-and indexes.
+The current [99-community production receipt](https://github.com/High-Signal-App/high-signal/issues/142)
+is the planning baseline: 31,569 comments retained from 50,270 observed, 2,589
+Reddit requests, zero retries, and 5,381,724 compressed bytes for posts,
+retained comments, and consumer events. At that rate, one year is approximately
+1.96 GB before small manifests and indexes.
 
-`events.jsonl.zst` is the versioned consumer contract. Reddit Insights verifies
-the pointer and SHA-256, decompresses the named object, and materializes only
-the bounded display/report fields needed for the active analysis. Temporary
-imports live under `artifacts/`, are never committed, and expire within seven
-days. Public pages contain only their current compact display projection.
+`events.jsonl.zst` is the versioned consumer payload. Reddit Insights publishes
+an authenticated latest manifest and streams the named immutable export through
+its private API. High Signal and Mentionpilot verify the SHA-256 and materialize
+only the bounded fields they need. They never receive R2 credentials. Temporary
+consumer imports are never committed and expire within seven days. Public pages
+contain only their current compact display projection.
 
 Historical subreddit/date/keyword requests run as bounded asynchronous exports
 against the canonical packs. Results are streamed to the requester and expire
@@ -172,10 +177,10 @@ object per post, comment, or community-day.
 
 ### Retention and source deletion
 
-Canonical source content has a rolling 365-day limit, enforced by an R2
-lifecycle rule. GitHub Actions artifacts and Reddit Insights imports expire
-after seven days; one-off exports expire after 24 hours. No daily data is
-committed to Git.
+Canonical source content has a rolling 365-day limit, enforced on the Reddit
+Insights bucket by an R2 lifecycle rule. GitHub Actions artifacts and downstream
+consumer imports expire after seven days; one-off exports expire after 24
+hours. No daily data is committed to Git.
 
 Use R2 Standard for the 365-day archive. It has no minimum storage duration,
 retrieval fee, or charge for the first 10 GB-month each month. Infrequent Access
@@ -231,9 +236,9 @@ cost alone; it needs a measured archive receipt and a stated research need.
    window.
 6. Historical views use retained observations, show collection start dates and
    missing periods, and do not promise unavailable backfill.
-7. Community Intelligence moves from High Signal only after Reddit Insights
-   matches the research, digest, consumer, and deletion behavior it needs. Raw
-   archive ownership does not move with that product capability.
+7. Reddit Insights owns Reddit collection and archive policy. High Signal reads
+   the bounded Reddit Insights contract and owns only its downstream synthesis,
+   scoring, and publication state.
 
 ## Acceptance thresholds
 
@@ -255,8 +260,11 @@ following are demonstrated:
   retained/discarded records, compression, request use, and projected cost;
 - daily compressed output remains at or below 10 MB and the rolling-year
   projection remains at or below 4 GB for seven consecutive qualification runs;
-- Reddit Insights verifies the canonical pointer and object hash, renders a
-  source-linked sample, and leaves no second raw archive behind;
+- High Signal retrieves the latest bounded export from Reddit Insights,
+  verifies its manifest and object hash, and stores no raw archive or bucket
+  credential;
+- the former High Signal archive is removed after the migration inventory and
+  every retained object hash match the Reddit Insights copy;
 - a deletion fixture removes or redacts the source record from raw storage,
   indexes, exports, and caches within 48 hours; and
 - current Reddit authorization explicitly permits the use and retention model.
@@ -267,24 +275,28 @@ passes; the 1,000-community capacity ceiling is never presented as coverage.
 
 ## Rollout
 
-1. **Protect the baseline:** keep High Signal's current archive as the only raw
-   source and verify its current freshness, lifecycle, authorization, and pause
-   controls.
-2. **Remove roster drift:** generate Reddit Insights navigation and import scope
-   from the canonical 99-community roster; do not copy the list into runtime
-   code by hand.
-3. **Minimize version 3:** remove author identifiers and any unused raw fields,
+1. **Freeze the source:** inventory the current High Signal archive and pause
+   its writer before any Reddit Insights production write.
+2. **Move ownership:** import the canonical 99-community roster and proven
+   collector, Zstandard packing, resume, verification, and redaction behavior
+   into Reddit Insights. Provision `reddit-insights-archive` with the required
+   lifecycle and least-privilege bindings.
+3. **Migrate once:** copy retained partitions into the Reddit Insights bucket,
+   verify every manifest, object size, and SHA-256, publish the Reddit Insights
+   pointer, switch consumers, then remove the former High Signal raw copy. The
+   overlap is migration-only and capped at 24 hours.
+4. **Minimize version 3:** remove author identifiers and any unused raw fields,
    keep schema-normalized rows, and rerun the codec benchmark before changing
    the format.
-4. **Qualify retention:** observe 14 consecutive runs against the 10 MB/day and
+5. **Qualify retention:** observe 14 consecutive runs against the 10 MB/day and
    4 GB/year budgets and verify a real deletion propagation exercise.
-5. **Finish the consumer path:** make bounded historical exports and derived
-   research reports from the verified archive without persistent raw copies in
-   Reddit Insights.
-6. **Expand only for demonstrated need:** propose exact communities, measure a
+6. **Finish the consumer path:** expose authenticated latest and historical
+   exports from Reddit Insights, then verify High Signal and Mentionpilot can
+   consume them without R2 access or persistent raw copies.
+7. **Expand only for demonstrated need:** propose exact communities, measure a
    canary, benchmark packing/sharding, and set a new budget before adding any
    cohort beyond 99.
-7. **Later product:** migrate Community Intelligence only after the research,
+8. **Later product:** migrate Community Intelligence only after the research,
    digest, consumer, and deletion paths have proven parity.
 
 ## Boundaries

@@ -2,11 +2,11 @@
 
 ## Product boundary
 
-High Signal owns the canonical forward daily raw archive in private R2. Reddit
-Insights owns longitudinal analysis, subreddit-specific topic models,
-cross-period comparison, source inspection, and research methodology. It may
-retain its older research corpora, but it must not create a second forward raw
-archive.
+Reddit Insights owns the single canonical forward collector, roster, schema,
+private R2 archive, retention policy, deletion path, longitudinal analysis, and
+research methodology. High Signal is a downstream consumer. It receives only
+bounded, checksum-verifiable exports from Reddit Insights and holds neither raw
+Reddit archives nor bucket credentials.
 
 High Signal is the downstream synthesis product. It should consume only compact,
 qualified Reddit observations and combine them with independent sources. It
@@ -29,7 +29,7 @@ shifts remain research findings in the dashboard until the analyzer can attach
 representative post IDs to each topic-period observation. This avoids presenting
 unrelated popular posts as evidence for a trend.
 
-## Daily archive import
+## Migration-only archive import
 
 `npm run import:high-signal -- --events <events.jsonl.zst> --pointer <latest.json>
 --output-dir <temporary-directory> [--render <subreddit>]` converts the bounded
@@ -38,9 +38,21 @@ exact archive window and `rawArchiveDuplicated: false`; it is disposable and
 belongs under `artifacts/`, not the checked-in corpus. `--render` performs a
 render-only UI build and exits without starting the local server.
 
-## Future High Signal adapter
+This command supports the one-time move from the archive currently hosted by
+High Signal. After cutover, it is a recovery tool rather than the normal data
+direction. Its output remains disposable and expires within seven days.
 
-The adapter should:
+## High Signal consumer contract
+
+Reddit Insights publishes an authenticated latest manifest naming the newest
+complete `events.jsonl.zst` export, its source window, schema version, coverage,
+and SHA-256. High Signal downloads the export through Reddit Insights, verifies
+the hash, imports the bounded attention events, and deletes the downloaded file
+within seven days. It never reconstructs R2 object paths or receives R2 access.
+
+## Qualified-finding handoff
+
+The downstream adapter should:
 
 1. Poll or receive completed export artifacts.
 2. Upsert observations by their stable `id`.

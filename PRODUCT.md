@@ -60,6 +60,9 @@ findings back to source evidence. Generated reports and caches live under
   or whole-conversation topic prevalence.
 - Support subreddit-specific topic anchors.
 - Remain independently operable and local-first.
+- Own the single canonical forward Reddit collector and private raw archive;
+  High Signal and Mentionpilot consume bounded exports without raw bucket
+  credentials or retained raw copies.
 - Treat High Signal as a downstream consumer of qualified, structured findings,
   not raw corpus data or dashboard-specific report objects.
 - Preserve High Signal's evidence-first contract: a Reddit finding is one source
