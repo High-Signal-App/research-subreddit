@@ -14,7 +14,7 @@ const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
-const footerScripts = `<script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
+const footerScripts = `<script src="/app-health-log.js" defer></script><script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
 const SEARCH_ANCHOR = `<main><section class="studio-opening canon-opening" id="canon">`;
@@ -161,6 +161,7 @@ try {
   for (const [from, to] of [
     [join(ROOT, "scripts", "lib", "search-ranking.mjs"), join(DIST_DIR, "assets", "lib", "search-ranking.mjs")],
     [join(ROOT, "scripts", "browser", "search-client.mjs"), join(DIST_DIR, "assets", "browser", "search-client.mjs")],
+    [join(ROOT, "scripts", "browser", "app-health-log.js"), join(DIST_DIR, "app-health-log.js")],
   ]) {
     mkdirSync(dirname(to), { recursive: true });
     copyFileSync(from, to);

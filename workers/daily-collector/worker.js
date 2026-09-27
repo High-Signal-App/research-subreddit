@@ -1,4 +1,5 @@
 import { COMMUNITIES } from "./communities.js";
+import { pingFor } from "./ping.js";
 
 const LISTING_LIMIT = 100;
 const CONCURRENCY = 5;
@@ -236,6 +237,11 @@ export async function runCollection(env, options = {}) {
     httpMetadata: { contentType: "application/json" },
   });
   console.log(JSON.stringify({ event: "daily_collection", ...manifest, results: undefined }));
+  await pingFor(env)(failed.length ? "collection.partial" : "collection.completed", {
+    level: failed.length ? "warn" : "info",
+    title: `${manifest.stored}/${manifest.requested} communities collected`,
+    props: { stored: manifest.stored, failed: manifest.failed, permanentFailures: manifest.permanentFailures },
+  });
   if (failed.length) throw new Error(`partial_collection_${failed.length}_failed`);
   return manifest;
 }
