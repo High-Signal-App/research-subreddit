@@ -14,7 +14,8 @@ const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
-const footerScripts = `<script src="/app-health-log.js" defer></script><script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
+const footerCapture = `<saas-maker-newsletter-capture catalog-id="reddit-insights" product-name="Reddit Insights" kind="newsletter" source="footer" privacy-url="/privacy/" theme="dark"></saas-maker-newsletter-capture>`;
+const footerScripts = `<script src="/app-health-log.js" defer></script><script defer src="https://health.sassmaker.com/tracker.js" data-key="ahk_pub_5fd468bae12640af79faa6aa53f76cc7e453914551888aed55e73f0a7d762417" data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110" data-identity="session" data-endpoint="https://ingest.sassmaker.com/v1/browser"></script><script type="module" src="https://sassmaker.com/newsletter-capture.js"></script><script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
 const SEARCH_ANCHOR = `<main><section class="studio-opening canon-opening" id="canon">`;
@@ -43,7 +44,7 @@ function searchSection(community) {
   return `<section id="post-search" data-community="${label}" aria-labelledby="post-search-heading">
   <h2 id="post-search-heading">Find a post in r/${label}</h2>
   <p class="post-search-deck">Ranked over every collected post title and body in this community. The corpus chunk is fetched once, then searched entirely in your browser — nothing you type leaves this page.</p>
-  <form id="post-search-form" role="search"><label class="visually-hidden" for="post-search-input">Search collected r/${label} posts</label><input id="post-search-input" type="search" name="q" placeholder="e.g. self-hosting costs" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form>
+  <form id="post-search-form" role="search" data-app-health-event="post_search_submitted"><label class="visually-hidden" for="post-search-input">Search collected r/${label} posts</label><input id="post-search-input" type="search" name="q" placeholder="e.g. self-hosting costs" autocomplete="off" enterkeyhint="search"><button type="submit">Search</button></form>
   <p id="post-search-status" role="status">Type a phrase to rank every collected post in this community.</p>
   <ul id="post-search-results"></ul>
 </section>`;
@@ -80,10 +81,15 @@ function staticHtml(html, community) {
     },
   }).replaceAll("<", "\\u003c");
   const metadata = `<meta name="description" content="${description}"><link rel="canonical" href="${canonicalUrl}"><meta property="og:type" content="website"><meta property="og:site_name" content="Reddit Insights"><meta property="og:title" content="Reddit Insights — r/${community}"><meta property="og:description" content="${description}"><meta property="og:url" content="${canonicalUrl}"><meta property="og:image" content="${SOCIAL_IMAGE}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Reddit Insights — r/${community}"><meta name="twitter:description" content="${description}"><meta name="twitter:image" content="${SOCIAL_IMAGE}"><script type="application/ld+json">${structuredData}</script><script>fetch("https://us.i.posthog.com/i/v0/e/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({api_key:"phc_qgiAarw4Co4pw9fz3Fxj4UJaHmqzFetqs4JrXhGc35Nd",event:"page_view",distinct_id:crypto.randomUUID(),properties:{project_id:"reddit-insights"}}),keepalive:true}).catch(()=>{});</script><script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/y6bwkyh4qb";y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y6bwkyh4qb");window.clarity("set","project_id","reddit-insights");</script>`;
-  return html
+  const withInstrumentedSources = html.replace(/<a\b(?=[^>]*\bhref=["']https?:\/\/(?:www\.)?reddit\.com\/)[^>]*>/gi, anchor =>
+    /\bdata-app-health-event=/.test(anchor) ? anchor : anchor.replace(/>$/, ` data-app-health-event="source_thread_opened">`),
+  );
+  if (!withInstrumentedSources.includes("</footer>")) throw new Error("Could not locate the research footer for the consented capture form.");
+  return withInstrumentedSources
     .replace(dynamicNavigation, staticNavigation)
     .replace("</head>", `${metadata}${searchStyles}</head>`)
     .replace(SEARCH_ANCHOR, `<main>${searchSection(community)}${SEARCH_ANCHOR_TAIL}`)
+    .replace("</footer>", `${footerCapture}</footer>`)
     .replace("</body>", `<script type="module" src="/assets/browser/search-client.mjs"></script>${footerScripts}</body>`);
 }
 
@@ -129,6 +135,8 @@ try {
   const unavailableHtml = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Community unavailable · Reddit Insights</title><style>body{margin:0;background:#10151e;color:#edf1f7;font:16px/1.6 system-ui,sans-serif}main{max-width:56rem;margin:8vh auto;padding:24px}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15}p{max-width:65ch;color:#b5bfce}a{color:#78baff}a:focus-visible{outline:2px solid currentColor;outline-offset:4px}ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:12px;list-style:none;padding:0}li a{display:block;padding:10px 12px;border:1px solid #354256;border-radius:8px;overflow-wrap:anywhere}</style></head><body><main><p>Reddit Insights</p><h1>This community page is unavailable.</h1><p>The requested page is missing or has not been published. No other community's analysis has been substituted. Choose one of the available collected communities below.</p><p><a href="/">Open the default research view</a></p><h2>Available communities</h2><ul>${communities.map(community => `<li><a href="/r/${encodeURIComponent(community)}/">r/${community.replaceAll("&", "&amp;").replaceAll("<", "&lt;")}</a></li>`).join("")}</ul></main></body></html>`;
   writeFileSync(join(DIST_DIR, "404.html"), unavailableHtml);
   writeFileSync(join(DIST_DIR, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`);
+  mkdirSync(join(DIST_DIR, "privacy"), { recursive: true });
+  writeFileSync(join(DIST_DIR, "privacy", "index.html"), `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow"><title>Privacy · Reddit Insights</title><style>body{margin:0;background:#080b14;color:#f2f4fa;font:16px/1.65 system-ui,sans-serif}main{max-width:48rem;margin:0 auto;padding:clamp(1.5rem,5vw,4rem)}a{color:#72d7e7}h1,h2{line-height:1.2}p,li{color:#c1c7d5}</style><main><p><a href="/">Reddit Insights</a></p><h1>Privacy</h1><p>Reddit Insights is a public research archive. Its post search ranks the collected corpus in your browser; the words you search are not sent to this site or included in analytics.</p><h2>Anonymous usage analytics</h2><p>We collect page visits and a small set of actions (community or research-window changes, post searches, and source-thread opens) to understand whether the archive is useful. Analytics use a session-only identifier and do not include search text, post titles, email addresses, or Reddit account details.</p><h2>Optional email updates</h2><p>If you choose to subscribe, the signup service receives your email address and records your explicit consent so it can send occasional Reddit Insights newsletter emails. Subscription is optional. Use the unsubscribe link included in any email to stop future messages.</p><p>Source posts remain on Reddit. This site does not ask for your Reddit login.</p></main></html>\n`);
   writeFileSync(
     join(DIST_DIR, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${communities.map(community => `<url><loc>${ORIGIN}/r/${encodeURIComponent(community)}/</loc></url>`).join("")}</urlset>\n`,

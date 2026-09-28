@@ -57,11 +57,21 @@ test("the search runtime is published and wired into every community page", { sk
   assert.ok(existsSync(join(DIST, "assets", "lib", "search-ranking.mjs")));
   const client = readFileSync(join(DIST, "assets", "browser", "search-client.mjs"), "utf8");
   assert.match(client, /from "\.\.\/lib\/search-ranking\.mjs"/, "the shipped client import must resolve inside dist/assets");
+  assert.match(client, /link\.dataset\.appHealthEvent = "source_thread_opened"/, "search-result sources must emit the same source CTA event");
   for (const name of published.slice(0, 3)) {
     const page = readFileSync(join(DIST, "r", name, "index.html"), "utf8");
     assert.match(page, /<section id="post-search" data-community="/, `r/${name} is missing the search panel`);
+    assert.match(page, /data-app-health-event="post_search_submitted"/, `r/${name} is missing the privacy-safe post-search event`);
+    assert.match(page, /data-app-health-event="source_thread_opened"/, `r/${name} is missing source-thread event wiring`);
+    assert.match(page, /research_view_changed/, `r/${name} is missing community/research-window event wiring`);
+    assert.match(page, /saas-maker-newsletter-capture catalog-id="reddit-insights"/, `r/${name} is missing the consented footer capture`);
+    assert.match(page, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/, `r/${name} is missing the App Health visit tracker`);
     assert.match(page, /<script type="module" src="\/assets\/browser\/search-client\.mjs"><\/script>/, `r/${name} is missing the search controller`);
   }
+  const logger = readFileSync(join(DIST, "app-health-log.js"), "utf8");
+  assert.match(logger, /track\('source_thread_opened'\)/);
+  assert.match(logger, /track\(eventName\)/);
+  assert.match(readFileSync(join(DIST, "privacy", "index.html"), "utf8"), /session-only identifier/);
 });
 
 

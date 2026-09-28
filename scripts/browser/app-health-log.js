@@ -48,11 +48,16 @@
     }).catch(function () {});
   }
   window.appHealthLog = send;
+  function track(name) {
+    if (window.appHealth && typeof window.appHealth.track === 'function') window.appHealth.track(name);
+  }
   document.addEventListener(
     'submit',
     function (e) {
       var f = e.target;
       if (!f || f.tagName !== 'FORM') return;
+      var eventName = f.getAttribute('data-app-health-event');
+      if (eventName && (!f.querySelector('[type="search"]') || f.querySelector('[type="search"]').value.trim())) track(eventName);
       send('form.submitted', {
         title: f.id || f.getAttribute('name') || f.getAttribute('action') || 'form',
         props: { page: location.pathname },
@@ -70,6 +75,8 @@
           title: (t.textContent || '').trim().slice(0, 120) || name,
           props: { page: location.pathname },
         });
+      var source = e.target && e.target.closest ? e.target.closest('[data-app-health-event="source_thread_opened"]') : null;
+      if (source && source.href && /^https:\/\/(?:www\.)?reddit\.com\//i.test(source.href)) track('source_thread_opened');
     },
     true,
   );

@@ -67,6 +67,7 @@ if (root && form && input && status && results) {
       link.href = `https://reddit.com${entry.post.permalink}`;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
+      link.dataset.appHealthEvent = "source_thread_opened";
       link.textContent = decode(entry.post.title) || "(untitled post)";
       const preview = document.createElement("p");
       preview.textContent = decode(excerpt(entry.post.selftext, query));
