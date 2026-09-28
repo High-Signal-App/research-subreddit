@@ -69,7 +69,7 @@ test("the search runtime is published and wired into every community page", { sk
     assert.match(page, /<script type="module" src="\/assets\/browser\/search-client\.mjs"><\/script>/, `r/${name} is missing the search controller`);
   }
   const logger = readFileSync(join(DIST, "app-health-log.js"), "utf8");
-  assert.match(logger, /track\('source_thread_opened'\)/);
+  assert.match(logger, /actionName === 'source_thread_opened'.*track\(actionName\)/);
   assert.match(logger, /track\(eventName\)/);
   assert.match(readFileSync(join(DIST, "privacy", "index.html"), "utf8"), /session-only identifier/);
 });

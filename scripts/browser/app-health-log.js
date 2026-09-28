@@ -75,8 +75,10 @@
           title: (t.textContent || '').trim().slice(0, 120) || name,
           props: { page: location.pathname },
         });
-      var source = e.target && e.target.closest ? e.target.closest('[data-app-health-event="source_thread_opened"]') : null;
-      if (source && source.href && /^https:\/\/(?:www\.)?reddit\.com\//i.test(source.href)) track('source_thread_opened');
+      var action = e.target && e.target.closest ? e.target.closest('[data-app-health-event]') : null;
+      var actionName = action && action.getAttribute('data-app-health-event');
+      if (actionName === 'source_thread_opened' && action.href && /^https:\/\/(?:www\.)?reddit\.com\//i.test(action.href)) track(actionName);
+      else if (actionName === 'research_view_changed' && action.matches('button[data-community]')) track(actionName);
     },
     true,
   );
