@@ -94,6 +94,10 @@ Customize topic anchors per subreddit by creating `data/reddit-memory/<subreddit
 - The first analysis run downloads embedding models and caches embeddings in `data/reddit-memory/cache/`.
 - The proxy worker is optional; use it if you need to route Reddit API calls through Cloudflare.
 
+### Optional proxy endpoint health
+
+The Reddit proxy can send aggregate endpoint measurements to App Health when its optional `APP_HEALTH_INGEST_KEY` binding is configured. Events use the fixed `/health` label for the root health check and `/proxy` for all proxied Reddit paths; they contain only method, route label, status, duration, and the SDK-generated timestamp. `OPTIONS` preflight is excluded. Subreddit and post paths, search terms, query values, headers, cookies, credentials, and request or response bodies are never sent. With no ingestion key, no telemetry client is created and no event is sent. This support does not enable or deploy the proxy, or activate the separate daily-collector scaffold.
+
 
 ### Shareability repair — 2026-09-07
 

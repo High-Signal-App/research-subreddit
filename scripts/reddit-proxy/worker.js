@@ -1,6 +1,7 @@
 // Reddit JSON proxy with OAuth — runs from Cloudflare's IPs.
 // Uses script-app OAuth flow (free tier, 100 queries/min).
 // Secrets: REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET (set via wrangler secret put)
+import { withEndpointHealth } from "./endpoint-health.js";
 
 const REDDIT_BASE = "https://www.reddit.com";
 const UA = "reddit-insights/0.1 (by /u/sarthak_research)";
@@ -39,7 +40,7 @@ async function getOAuthToken(env) {
 }
 
 export default {
-  async fetch(request, env) {
+  fetch: withEndpointHealth(async (request, env) => {
     const url = new URL(request.url);
 
     // Health check
@@ -90,5 +91,5 @@ export default {
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
     }
-  },
+  }),
 };
