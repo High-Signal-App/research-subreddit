@@ -2,5 +2,11 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "reddit-insights",
   "compatibility_date": "2026-08-08",
-  "pages_build_output_dir": "./dist"
+  "pages_build_output_dir": "./dist",
+  "r2_buckets": [
+    {
+      "binding": "SNAPSHOT_EXPORTS",
+      "bucket_name": "reddit-insights-archive"
+    }
+  ]
 }

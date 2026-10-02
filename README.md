@@ -104,7 +104,7 @@ R2 binding named `SNAPSHOT_EXPORTS`; absent storage is an explicit unavailable s
 
 The adapter reads only `reddit-insights/exports/v1/index.json` and catalogued
 minimized derivatives beneath that prefix. It does not read or publish the raw
-archive. `wrangler.toml` binds the existing private derivative bucket.
+archive. `wrangler.jsonc` binds the existing private derivative bucket.
 
 `node scripts/publish-snapshots.mjs --refresh-only` discovers the canonical
 complete collection, verifies source packs when changed, uploads minimized gzip
