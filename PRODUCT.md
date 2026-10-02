@@ -19,9 +19,9 @@ through a date-addressable snapshot with source links and reconciled downloads.
 Its date identifies a collection with an explicit UTC window; it is not a
 historical front-page reconstruction or a complete conversation census.
 
-The snapshot feature is implemented locally. The public product currently
-remains the historical top-content observatory; production archive access,
-derivative refresh/removal and deployment still need qualification.
+The snapshot feature and private derivative publisher are implemented and
+qualified against real archived collections. Current release acceptance is
+recorded in [PROJECT_STATUS.md](PROJECT_STATUS.md) and GitHub issue #21.
 
 The workspace sends qualified data to High Signal. It is not a replacement for
 High Signal's cross-source synthesis or Daily Brief.

@@ -13,9 +13,10 @@ npm install
 
 ## Usage
 
-The snapshot viewer is implemented locally; production integration is pending
-([issue #21](https://github.com/High-Signal-App/research-subreddit/issues/21)).
-Prepare a verified daily v2 archive directory, then start the viewer:
+Snapshot Studio's release target is https://reddit-insights.highsignal.app/;
+[issue #21](https://github.com/High-Signal-App/research-subreddit/issues/21)
+records release acceptance. To run locally, prepare a verified daily v2 archive
+directory, then start the viewer:
 
 ```bash
 npm run snapshots:import -- --archive-dir /path/to/daily-archive
@@ -102,13 +103,20 @@ without a database. The new snapshot API requires Pages Functions and a private
 R2 binding named `SNAPSHOT_EXPORTS`; absent storage is an explicit unavailable state.
 
 The adapter reads only `reddit-insights/exports/v1/index.json` and catalogued
-minimized derivatives beneath that prefix. Upload the gzip derivatives first
-and the catalog last in a separately authorized release. It does not read or
-publish the raw archive. Configure automatic refresh/expiry/removal handling,
-restore the currently unavailable R2 account, and reconcile the actual deployed
-source checkout before releasing. None of those production steps were performed
-as part of the local implementation. Source tests cover the shared Web API and
-binding adapter; Cloudflare runtime/binding qualification remains a release gate.
+minimized derivatives beneath that prefix. It does not read or publish the raw
+archive. `wrangler.toml` binds the existing private derivative bucket.
+
+`node scripts/publish-snapshots.mjs --refresh-only` discovers the canonical
+complete collection, verifies source packs when changed, uploads minimized gzip
+objects, verifies readback and commits the catalog last. Initial publication
+requires `--initialize`; verified historical packs may be added with repeated
+`--archive-dir` arguments. High Signal's collection and redaction workflows
+serialize publication using the same concurrency group. Unchanged sources renew
+their 24-hour serving lease only after rereading the authoritative manifest.
+Active objects are retouched after five days; a seven-day lifecycle rule covers
+only obsolete derivative objects, excluding the catalog and raw archive.
+Source tests and a local Cloudflare runtime check qualify the binding adapter;
+release acceptance still requires anonymous live routes and download checks.
 
 ```bash
 npm run build:pages
