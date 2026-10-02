@@ -17,6 +17,11 @@ const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
 const footerCapture = `<saas-maker-newsletter-capture catalog-id="reddit-insights" product-name="Reddit Insights" kind="newsletter" source="footer" privacy-url="/privacy/" theme="dark"></saas-maker-newsletter-capture>`;
 const footerScripts = `<script src="/app-health-log.js" defer></script><script defer src="https://health.sassmaker.com/tracker.js" data-key="ahk_pub_5fd468bae12640af79faa6aa53f76cc7e453914551888aed55e73f0a7d762417" data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110" data-identity="session" data-endpoint="https://ingest.sassmaker.com/v1/browser"></script><script type="module" src="https://sassmaker.com/newsletter-capture.js"></script><script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
 
+const newsletterScriptMarker = '<script type="module" src="https://sassmaker.com/newsletter-capture.js">';
+const newsletterScriptIndex = footerScripts.indexOf(newsletterScriptMarker);
+if (newsletterScriptIndex < 0) throw new Error("Could not locate the shared newsletter script marker to derive App Health scripts.");
+const appHealthScripts = footerScripts.slice(0, newsletterScriptIndex);
+
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
 const SEARCH_ANCHOR = `<main><section class="studio-opening canon-opening" id="canon">`;
@@ -135,6 +140,9 @@ try {
   for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) {
     copyFileSync(join(ROOT, "scripts", "snapshots", "viewer", file), join(DIST_DIR, "snapshots", file));
   }
+  const readerPath = join(DIST_DIR, "snapshots", "index.html");
+  const readerHtml = readFileSync(readerPath, "utf8").replace("</body>", `${appHealthScripts}</body>`);
+  writeFileSync(readerPath, readerHtml);
   const homeHtml = readFileSync(join(ROOT, "scripts", "snapshots", "viewer", "home.html"), "utf8")
     .replace("<footer>", `<section class="shared-footer" aria-label="Product updates">${footerCapture.replace('theme="dark"', 'theme="light"')}</section><footer>`)
     .replace("</body>", `${footerScripts}</body>`);

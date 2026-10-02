@@ -33,7 +33,16 @@ test("snapshot entry point ships its controller without copying private archive 
     assert.equal(home.split(`https://sassmaker.com/${sharedScript}`).length - 1, 1, `${sharedScript} must load once on the homepage`);
   }
   assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
-  assert.match(readFileSync(join(DIST, "snapshots", "index.html"), "utf8"), /src="\/snapshots\/app.mjs"/);
+  const reader = readFileSync(join(DIST, "snapshots", "index.html"), "utf8");
+  assert.match(reader, /src="\/snapshots\/app\.mjs"/);
+  assert.match(reader, /src="\/app-health-log\.js"/);
+  assert.match(reader, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-identity="session"/);
+  const readerTrackerKey = reader.match(/https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-key="(ahk_pub_[A-Za-z0-9_-]+)"/)?.[1];
+  assert.equal(readerTrackerKey, trackerKey, "daily reader must reuse the homepage's origin-scoped browser key");
+  assert.match(reader, /<button id="share" data-app-health-event="snapshot_link_copy_clicked">/);
+  for (const id of ["json-download", "posts-download", "comments-download"]) {
+    assert.match(reader, new RegExp(`<a id="${id}" data-app-health-event="snapshot_download_clicked">`));
+  }
   for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) assert.ok(existsSync(join(DIST, "snapshots", file)));
   assert.deepEqual(readdirSync(join(DIST, "snapshots")).sort(), ["app.mjs", "fonts", "home-model.mjs", "home.css", "home.mjs", "index.html", "insights.mjs", "paths.mjs", "style.css", "theme.css"]);
   assert.match(readFileSync(join(DIST, "_redirects"), "utf8"), /\/r\/:community\/:date\/ \/snapshots\/ 200/);

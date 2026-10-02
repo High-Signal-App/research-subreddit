@@ -79,6 +79,8 @@
       var actionName = action && action.getAttribute('data-app-health-event');
       if (actionName === 'source_thread_opened' && action.href && /^https:\/\/(?:www\.)?reddit\.com\//i.test(action.href)) track(actionName);
       else if (actionName === 'research_view_changed' && action.matches('button[data-community]')) track(actionName);
+      else if (actionName === 'snapshot_download_clicked' && action.matches('a[download]')) track(actionName);
+      else if (actionName === 'snapshot_link_copy_clicked' && action.matches('button#share')) track(actionName);
     },
     true,
   );
