@@ -2,8 +2,10 @@
 
 Updated October 2, 2026. Tracking: [snapshot feature #21](https://github.com/High-Signal-App/research-subreddit/issues/21).
 
-Snapshot Studio is live at https://reddit-insights.highsignal.app/ with 198
-verified community/day snapshots: 99 communities on September 30 and October 1.
+Snapshot Studio is live at https://reddit-insights.highsignal.app/. At final
+release acceptance, the catalog contains 297 verified community/day snapshots:
+99 communities across September 30, October 1 and October 2. Availability follows
+the live catalog as subsequent collections publish and serving leases renew.
 Anonymous lookup, clean and pinned links, captured discussion, insights and
 JSON/posts CSV/comments CSV downloads pass public acceptance. The owner
 authorized the existing private R2 binding, automated collection/redaction
