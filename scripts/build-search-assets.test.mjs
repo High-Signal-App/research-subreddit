@@ -28,7 +28,10 @@ test("snapshot entry point ships its controller without copying private archive 
   const loggerKey = loggerSource.match(/var KEY = '(ahk_pub_[A-Za-z0-9_-]+)'/)?.[1];
   assert.ok(trackerKey && loggerKey, "homepage tracker and browser logger must both carry a public key");
   assert.equal(loggerKey, trackerKey, "browser logs must use the existing tracker key scoped to this product origin");
-  assert.doesNotMatch(home, /newsletter-capture|project-strip|ai-chat-footer/);
+  assert.match(home, /<saas-maker-newsletter-capture[^>]*catalog-id="reddit-insights"[^>]*theme="light"/);
+  for (const sharedScript of ["newsletter-capture.js", "project-strip.js", "ai-chat-footer.js"]) {
+    assert.equal(home.split(`https://sassmaker.com/${sharedScript}`).length - 1, 1, `${sharedScript} must load once on the homepage`);
+  }
   assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
   assert.match(readFileSync(join(DIST, "snapshots", "index.html"), "utf8"), /src="\/snapshots\/app.mjs"/);
   for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) assert.ok(existsSync(join(DIST, "snapshots", file)));

@@ -1,0 +1,243 @@
+{
+  "$schema": "fleet.design-review.v2",
+  "version": 2,
+  "project": "reddit-insights-apphealth-release-20261003",
+  "target": "Restore approved shared homepage footer",
+  "surfaceMode": "persuade",
+  "mode": "preserve",
+  "register": "product",
+  "context": {
+    "product": "PRODUCT.md",
+    "design": "DESIGN.md"
+  },
+  "direction": {
+    "productSurfaces": {
+      "scope": "paired",
+      "landing": "/",
+      "app": "/snapshots/",
+      "reason": "Restore shared capture/footer on the public homepage while checking the Snapshot Studio daily reader handoff."
+    },
+    "pairedPreview": {
+      "landing": "",
+      "app": ""
+    },
+    "source": "existing",
+    "references": [
+      "DESIGN.md",
+      "https://github.com/sass-maker/saas-maker/issues/156"
+    ],
+    "probes": [],
+    "selected": "Snapshot Studio with approved Direct line footer",
+    "approval": "not-required",
+    "ownerEvidence": {
+      "path": "https://github.com/sass-maker/saas-maker/issues/156",
+      "quote": "owner-selected 02 \u2014 Direct line"
+    },
+    "supplied": "",
+    "before": "artifacts/design/footer-restoration/before-home-1440.jpg",
+    "library": {
+      "strategy": "upstream-first",
+      "primary": "existing-project-system",
+      "sources": [
+        "https://github.com/sass-maker/saas-maker/issues/156"
+      ],
+      "runtime": "existing",
+      "customReplacement": {
+        "used": false,
+        "authorization": "not-required",
+        "reason": "Reuse existing shared scripts and newsletter web component; no custom replacement."
+      }
+    },
+    "contract": {
+      "purpose": "Reddit Insights helps people inspect and share captured subreddit/day evidence through a date-addressable snapshot with source links and reconciled downloads.",
+      "purposeSource": "PRODUCT.md; owner-approved Snapshot Studio in DESIGN.md; site-health/docs/project-dossiers/reddit-insights.yaml",
+      "canonicalPurpose": "Reddit Insights studies how topics, signals, and emotional tone inside a subreddit change over time.",
+      "purposeAlignment": "repository-override",
+      "driftNote": "Canonical purpose supports retained subreddit evidence, but its finished-experiment classification and no-roadmap next action lag the owner-approved Snapshot Studio release. This bounded restoration does not change that classification or promise ongoing monitoring.",
+      "audience": "The Fleet operator and anyone receiving a shared snapshot.",
+      "job": "Understand what a subreddit/day snapshot contains, select a community and collection date, then inspect/share/download the evidence.",
+      "thesis": "A recognisable landing front door with real captured-data proof and immediate community/day lookup.",
+      "system": "Snapshot Studio: pale paper, navy ink, cobalt actions and dated proof stage; self-hosted Archivo; asymmetric lookup and actual captured-post preview. Native controls and quiet reading surfaces.",
+      "signature": "Each direction exposes the actual Oct1 AI_Agents capture and a direct route to71posts/350retainedcomments.",
+      "risk": "Shared footer assets can introduce theme or mobile overflow regressions; verify both home and reader without submitting real newsletter or feedback.",
+      "qualityBar": "Preserve Snapshot Studio composition and add the approved footer with light host tokens, clear consent, mobile fit and working feedback access."
+    }
+  },
+  "evidence": {
+    "platform": "web",
+    "productContinuity": {
+      "status": "pass",
+      "reason": "Preserve established landing/reader pairing",
+      "reviewer": "root rendered review",
+      "report": "artifacts/design/footer-restoration/product-continuity.md",
+      "surfaces": {
+        "landing": "artifacts/design/footer-restoration/footer-1440.jpg",
+        "app": "artifacts/design/footer-restoration/reader-1440.jpg"
+      },
+      "checks": {
+        "designSystem": {
+          "status": "pass",
+          "observation": "Both use Archivo, pale paper, navy ink and cobalt action. Reader uses denser controls for inspection; homepage keeps lookup and proof stage."
+        },
+        "identity": {
+          "status": "pass",
+          "observation": "Reddit Insights wordmark and daily snapshot vocabulary persist across the handoff."
+        },
+        "vocabulary": {
+          "status": "pass",
+          "observation": "Community, collection date, captured posts and retained comments are used consistently; no census claim."
+        },
+        "productTruth": {
+          "status": "pass",
+          "observation": "Actual selected Oct2 AI_Agents collection reads 70 captured posts and 372 retained comments; both name source/filter limits."
+        },
+        "handoff": {
+          "status": "pass",
+          "observation": "Homepage lookup and /snapshots reader use the same public collection API. Actual reader loaded at all three sizes; clean-date reload required resetting the temporary static preview, not a production routing change."
+        }
+      }
+    },
+    "slopScale": {
+      "platform": "web",
+      "posture": "advisory",
+      "reason": "Preserve lane uses the already selected systems; iteration and final scans are required after implementation.",
+      "checkpoints": [
+        {
+          "stage": "iteration",
+          "status": "scanned",
+          "command": "node /Users/sarthak/Desktop/fleet/saas-maker/tooling/scripts/slop-score.mjs http://127.0.0.1:17431/ --json",
+          "report": ".fleet-local/slop/footer-iteration.json",
+          "findingsReview": "No triggered upstream patterns. Rendered shadow components additionally reviewed at 390, 768 and 1440. Preserved newsletter consent and privacy, cobalt action and Archivo font; no horizontal document overflow."
+        },
+        {
+          "stage": "final",
+          "status": "scanned",
+          "command": "node /Users/sarthak/Desktop/fleet/saas-maker/tooling/scripts/slop-score.mjs http://127.0.0.1:17431/ --json",
+          "report": ".fleet-local/slop/footer-final.json",
+          "findingsReview": "No triggered upstream patterns; actual shadow components and paired reader manually reviewed. Score is advisory, no owner acceptance or causal performance claim."
+        }
+      ]
+    },
+    "visualReview": {
+      "status": "pass",
+      "reviewer": "root rendered review",
+      "direction": "Snapshot Studio with approved Direct line footer",
+      "report": "artifacts/design/footer-restoration/review.md",
+      "checks": {
+        "hierarchy": {
+          "status": "pass",
+          "observation": "Newsletter remains below snapshot lookup, captured evidence and how-it-works. The primary lookup hierarchy is unchanged."
+        },
+        "typography": {
+          "status": "pass",
+          "observation": "Newsletter inherits Archivo and uses the established ink/muted hierarchy; rendered button font is Archivo. Shared secondary footer typography is preserved."
+        },
+        "composition": {
+          "status": "pass",
+          "observation": "Restored capture is in a 1280px footer region aligned to the existing outer page edge; shared AI/strip follows before the original metadata footer."
+        },
+        "identity": {
+          "status": "pass",
+          "observation": "Capture uses paper/ink and the existing cobalt action; computed button background is rgb(49,89,232), white text."
+        },
+        "interaction": {
+          "status": "pass",
+          "observation": "Consent checkbox is required; privacy route is present. Feedback launcher opened a visible Feedback dialog with Bug/Feature/Feedback options without submitting. Snapshot reader loaded the selected community/day."
+        },
+        "responsive": {
+          "status": "pass",
+          "observation": "Actual browser emulation checked 390,768,1440 widths; document scroll width never exceeds viewport. 390 stacks newsletter action and feedback, tablet wraps newsletter and retains bounded footer, desktop retains two-column shared extension."
+        }
+      }
+    },
+    "screenshots": [
+      {
+        "width": 390,
+        "path": "artifacts/design/footer-restoration/footer-390.jpg"
+      },
+      {
+        "width": 768,
+        "path": "artifacts/design/footer-restoration/footer-768.jpg"
+      },
+      {
+        "width": 1440,
+        "path": "artifacts/design/footer-restoration/footer-1440.jpg"
+      },
+      {
+        "width": 390,
+        "path": "artifacts/design/footer-restoration/reader-390.jpg"
+      },
+      {
+        "width": 768,
+        "path": "artifacts/design/footer-restoration/reader-768.jpg"
+      },
+      {
+        "width": 1440,
+        "path": "artifacts/design/footer-restoration/reader-1440.jpg"
+      }
+    ],
+    "projectCheck": {
+      "command": "node scripts/build-pages.mjs; node --test scripts/build-search-assets.test.mjs; npm test; node --check scripts/build-pages.mjs",
+      "status": "pass"
+    },
+    "critique": {
+      "score": 34,
+      "maximum": 40,
+      "dimensions": {
+        "hierarchy": 7,
+        "typography": 7,
+        "composition": 6,
+        "identity": 6,
+        "interaction": 4,
+        "responsive": 4
+      },
+      "method": "Advisory root rubric after actual paired renders; concrete findings are in rendered review."
+    },
+    "audit": {
+      "score": 17,
+      "maximum": 20,
+      "dimensions": {
+        "purpose": 4,
+        "accessibility": 5,
+        "behavior": 3,
+        "responsive": 3,
+        "performance": 2
+      },
+      "method": "Bounded restoration audit; no live submissions or speed benchmark."
+    },
+    "unresolved": {
+      "p0": 0,
+      "p1": 0
+    },
+    "detector": {
+      "posture": "advisory",
+      "findings": []
+    },
+    "comprehension": {
+      "status": "pass",
+      "reviewer": "root fresh viewport review",
+      "answers": {
+        "product": "Captured subreddit/day snapshot viewer",
+        "audience": "Community inspectors and shared-link recipients",
+        "value": "Inspect source-linked discussion and take attributable data with you",
+        "mechanism": "Select a subreddit and collection date, open captured posts/comments",
+        "proof": "Selected real collection date and captured/retained counts with explicit filtering/window",
+        "nextAction": "Open snapshot; optional newsletter or feedback in footer"
+      },
+      "purposeScore": {
+        "product": 25,
+        "audience": 13,
+        "value": 14,
+        "mechanism": 15,
+        "proof": 14,
+        "nextAction": 15,
+        "total": 96
+      },
+      "mismatches": []
+    }
+  },
+  "ownerFeedback": {
+    "decision": "not-required",
+    "note": "Preserve work follows the existing direction; this is not owner acceptance of the result."
+  }
+}
