@@ -19,3 +19,6 @@
 #lookup,#how{scroll-margin-top:24px}
 
 .brand{min-height:44px}.sample-note{max-width:58ch;margin-inline:auto}
+
+.shared-footer{max-width:1280px;margin:0 auto 32px}.shared-footer saas-maker-newsletter-capture{--newsletter-capture-text:var(--ink);--newsletter-capture-muted:var(--muted);--newsletter-capture-border:var(--rule);--newsletter-capture-surface:var(--field);--newsletter-capture-focus:var(--focus);--newsletter-capture-action:var(--action);--newsletter-capture-action-text:var(--action-ink)}
+@media(max-width:1380px){.shared-footer{margin-left:5%;margin-right:5%}}
