@@ -58,6 +58,21 @@ try {
     const items = prepareSnapshots(snapshots, now);
     catalog = replaceSource(catalog, items); prepared.push(...items); updated.add(prefix);
   }
+  // Always discover the complete canonical latest run. A queued refresh/redaction
+  // job can then recover a collection even if its own publish job was superseded.
+  const latest = JSON.parse(await get("high-signal-reddit-archive", "reddit/v2/latest.json", join(work, "latest.json")));
+  const match = /^reddit\/v2\/run=([1-9][0-9]*)\/attempt=([1-9][0-9]*)\/date=(\d{4}-\d{2}-\d{2})\/manifest.json$/.exec(latest.objects?.manifest || "");
+  if (latest.status !== "complete" || !match) throw new Error("Invalid canonical archive pointer");
+  const latestPrefix = archivePrefix({ source: { run: match[1], attempt: match[2] }, date: match[3] });
+  if (!updated.has(latestPrefix)) {
+    const directory = join(work, "latest-archive"); await mkdir(directory);
+    const manifest = await get("high-signal-reddit-archive", latest.objects.manifest, join(directory, "manifest.json"));
+    const entries = catalog.entries.filter(entry => archivePrefix(entry) === latestPrefix);
+    if (!renewSource(entries, manifest, now)) {
+      const items = prepareSnapshots(await downloadArchive(latestPrefix, directory, manifest), now);
+      catalog = replaceSource(catalog, items); prepared.push(...items); updated.add(latestPrefix);
+    }
+  }
   const groups = new Map();
   for (const entry of catalog.entries) {
     const prefix = archivePrefix(entry);
