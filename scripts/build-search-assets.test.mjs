@@ -20,6 +20,10 @@ test("snapshot entry point ships its controller without copying private archive 
   const home = readFileSync(join(DIST, "index.html"), "utf8");
   assert.match(home, /Reddit, one day at a time/);
   assert.match(home, /src="\/snapshots\/home.mjs"/);
+  assert.match(home, /id="lookup"[^>]*data-app-health-event="snapshot_lookup_submitted"/);
+  assert.match(home, /src="\/app-health-log\.js"/);
+  assert.match(home, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/);
+  assert.doesNotMatch(home, /newsletter-capture|project-strip|ai-chat-footer/);
   assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
   assert.match(readFileSync(join(DIST, "snapshots", "index.html"), "utf8"), /src="\/snapshots\/app.mjs"/);
   for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) assert.ok(existsSync(join(DIST, "snapshots", file)));
@@ -84,6 +88,7 @@ test("the search runtime is published and wired into every community page", { sk
   assert.match(logger, /actionName === 'source_thread_opened'.*track\(actionName\)/);
   assert.match(logger, /track\(eventName\)/);
   assert.match(readFileSync(join(DIST, "privacy", "index.html"), "utf8"), /session-only identifier/);
+  assert.match(readFileSync(join(DIST, "privacy", "index.html"), "utf8"), /snapshot lookup submissions/);
 });
 
 
