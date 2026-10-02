@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse captured Reddit posts and discussion by subreddit and collection date. Share a snapshot or download its data.">
+  <title>Daily snapshots · Reddit Insights</title>
+  <link rel="stylesheet" href="/snapshots/style.css">
+  <script type="module" src="/snapshots/app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#snapshot">Skip to snapshot</a>
+  <header class="masthead"><a class="brand" href="/"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 30 30"><rect x="1" y="1" width="28" height="28" rx="8" fill="currentColor"/><path d="M8 9h14M8 15h9M8 21h5" stroke="var(--paper)" stroke-width="3" stroke-linecap="round"/></svg>Reddit Insights</a><span class="masthead-note">Daily snapshots</span></header>
+  <div class="workspace">
+    <aside aria-label="Choose a snapshot">
+      <p class="eyebrow">THE ARCHIVE</p>
+      <label for="community">Subreddit</label>
+      <select id="community" disabled><option>Loading communities…</option></select>
+      <label for="date">Collection date</label>
+      <input id="date" type="date" disabled>
+      <select id="available-date" aria-label="Available collection date" disabled><option>Loading dates…</option></select>
+      <div class="calendar-head"><button id="month-prev" aria-label="Previous month">←</button><strong id="month-label"></strong><button id="month-next" aria-label="Next month">→</button></div>
+      <div class="weekdays" aria-hidden="true"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      <div id="calendar" class="calendar" aria-label="Collection days"></div>
+      <p class="calendar-key"><i></i> Available collection</p>
+      <div class="date-navigation"><button id="previous" disabled>← Earlier</button><button id="next" disabled>Later →</button></div>
+      <p id="archive-count" class="aside-note"></p>
+      <p class="aside-note">A date identifies a collection. The snapshot shows its exact 24-hour window in UTC.</p>
+    </aside>
+    <main id="snapshot" tabindex="-1">
+      <div class="opening"><div><p class="eyebrow">SUBREDDIT / DAY</p><h1 id="heading">Your daily snapshot</h1><p id="subtitle" class="deck">Choose a community and collection date to explore what was captured.</p></div><span id="coverage-badge" class="badge" hidden></span></div>
+      <p id="status" class="status" role="status" aria-live="polite">Loading the archive…</p>
+      <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+      <button id="recover" hidden>Open latest available collection</button>
+      <section id="summary" class="summary" aria-label="Snapshot coverage" hidden>
+        <div><strong id="post-count"></strong><span>captured posts</span></div><div><strong id="comment-count"></strong><span>retained comments</span></div><div class="window"><span>Collection window · UTC</span><strong id="window"></strong></div>
+        <p class="summary-note">Comments are filtered; this is not the full conversation.</p>
+      </section>
+      <section id="content" hidden>
+        <div class="export-bar"><div><strong>Take this snapshot with you</strong><span>Share the collection or download its captured data.</span></div><div class="export-actions"><button id="share">Copy link</button><a id="json-download">JSON ↓</a><a id="posts-download">Posts CSV ↓</a><a id="comments-download">Comments CSV ↓</a></div></div>
+        <p id="share-expiry" class="deck share-expiry"></p>
+        <div id="share-fallback" hidden><label for="share-url">Snapshot link</label><input id="share-url" readonly></div>
+        <p id="share-status" class="feedback" role="status" aria-live="polite"></p>
+        <details id="insights" class="insights" hidden><summary><h2>What stood out <span id="insights-preview"></span></h2></summary><div class="insights-body"><p id="insights-note"></p><ol id="insight-facts"></ol><h3>Compared with the previous collection</h3><p id="comparison" role="status" aria-live="polite"></p></div></details>
+        <div class="list-heading"><h2>Captured posts</h2><p id="list-count" role="status" aria-live="polite"></p></div>
+        <div class="filters"><div><label for="search" class="sr-only">Search post titles and text</label><input id="search" type="search" placeholder="Search posts…" autocomplete="off"></div><div><label for="sort" class="sr-only">Sort posts</label><select id="sort"><option value="score">Highest score</option><option value="latest">Newest first</option><option value="replies">Most reported replies</option></select></div></div>
+        <div class="columns" aria-hidden="true"><span>POST / PUBLISHED AT</span><span>SCORE</span><span>REPLIES</span></div>
+        <ol id="posts" class="posts"></ol>
+        <p id="no-results" class="empty" hidden>No posts match your search. Try a different phrase.</p>
+        <button id="more" class="more" hidden>Show more posts</button>
+      </section>
+      <section id="limits" class="limits" hidden><h2>What this snapshot includes</h2><p id="coverage-note"></p><p id="capture-note"></p><p>Scores and reply totals are recorded at capture time. Retained comments are filtered; they are not a complete conversation. Author names and profile identifiers are omitted from the viewer and exports.</p><p id="source-note"></p></section>
+      <footer>Reddit Insights · Source posts remain on Reddit.</footer>
+    </main>
+  </div>
+  <dialog id="thread" aria-labelledby="thread-heading"><div class="thread-top"><span class="eyebrow">CAPTURED DISCUSSION</span><button id="close-thread" aria-label="Close discussion">Close ×</button></div><h2 id="thread-heading"></h2><p id="thread-meta" class="deck"></p><a id="thread-source" target="_blank" rel="noopener noreferrer">Open source on Reddit ↗</a><p id="thread-body" class="prose"></p><h3 id="reply-heading"></h3><p class="deck">Replies below were retained at collection time. Indentation follows the captured parent relationship.</p><div id="replies"></div></dialog>
+  <noscript><p class="status">Enable JavaScript to choose a snapshot. The JSON API is available at /api/snapshots/catalog.</p></noscript>
+</body>
+</html>

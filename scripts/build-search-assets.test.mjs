@@ -7,7 +7,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 const ROOT = process.cwd();
-const DIST = join(ROOT, "dist");
+const DIST = process.env.PAGES_OUTPUT_DIR || join(ROOT, "dist");
 const DIST_DATA = join(DIST, "data");
 const skip = existsSync(DIST_DATA) ? false : "dist/data is absent — run npm run build:pages first";
 
@@ -15,6 +15,18 @@ const index = JSON.parse(readFileSync(join(ROOT, "data", "reddit-display", "inde
 const roster = JSON.parse(readFileSync(join(ROOT, "config", "community-roster.json"), "utf8"));
 const excluded = new Set(roster.excludedCommunities || []);
 const published = index.rows.map(row => row.subreddit).filter(name => !excluded.has(name));
+
+test("snapshot entry point ships its controller without copying private archive data", { skip }, () => {
+  const home = readFileSync(join(DIST, "index.html"), "utf8");
+  assert.match(home, /Reddit, one day at a time/);
+  assert.match(home, /src="\/snapshots\/home.mjs"/);
+  assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
+  assert.match(readFileSync(join(DIST, "snapshots", "index.html"), "utf8"), /src="\/snapshots\/app.mjs"/);
+  for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) assert.ok(existsSync(join(DIST, "snapshots", file)));
+  assert.deepEqual(readdirSync(join(DIST, "snapshots")).sort(), ["app.mjs", "fonts", "home-model.mjs", "home.css", "home.mjs", "index.html", "insights.mjs", "paths.mjs", "style.css", "theme.css"]);
+  assert.match(readFileSync(join(DIST, "_redirects"), "utf8"), /\/r\/:community\/:date\/ \/snapshots\/ 200/);
+  assert.ok(!existsSync(join(DIST, "reddit-insights", "exports")));
+});
 
 test("every published community ships a gzipped corpus chunk", { skip }, () => {
   const missing = published.filter(name => !existsSync(join(DIST_DATA, `${name}.json.gz`)));

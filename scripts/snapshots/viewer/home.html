@@ -1,0 +1,72 @@
+<!doctype html>
+<!--
+THESIS: A captured day is the proof. Lead with lookup and actual discussion.
+OWN-WORLD: Pale paper, navy Archivo, cobalt date stage, visible native controls.
+STORY: Recognize subreddit/day evidence, choose a collection, inspect and share it.
+FIRST VIEWPORT: Oversized three-line title and lookup at left; large dated proof at right. On phone, lookup precedes the preview.
+FORM: Owner-approved A Snapshot Studio, asymmetric split/product stage. Approved comp: artifacts/design/landing-directions/a-1440.png. Selection overrides further concept generation.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore captured Reddit posts and discussion by subreddit and collection date. Share a snapshot or download its data.">
+  <title>Reddit Insights · Reddit, one day at a time</title>
+  <link rel="stylesheet" href="/snapshots/home.css">
+  <script type="module" src="/snapshots/home.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#lookup">Skip to collection lookup</a>
+  <header class="nav">
+    <a class="brand" href="/"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 30 30"><rect x="1" y="1" width="28" height="28" rx="8" fill="currentColor"/><path d="M8 9h14M8 15h9M8 21h5" stroke="var(--paper)" stroke-width="3" stroke-linecap="round"/></svg>Reddit Insights</a>
+    <nav aria-label="Main"><a href="#how">How it works</a><a href="#lookup" class="nav-action">Explore snapshots <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main>
+    <section class="hero content">
+      <div class="intro">
+        <p class="section-label">A view into your communities.</p>
+        <h1>Reddit,<br>one day<br> <span>at a time.</span></h1>
+        <p class="lede">See what a subreddit was talking about. Explore captured posts, follow the discussion, and take the data with you.</p>
+        <form id="lookup" class="lookup" action="/snapshots/" method="get">
+          <label>Subreddit<select id="home-community" name="subreddit" disabled><option>Loading communities…</option></select></label>
+          <label>Collection date<select id="home-date" name="date" disabled><option>Loading dates…</option></select></label>
+          <button id="open-snapshot" type="submit" disabled>Open snapshot <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="subnote">No account. Source-linked posts. JSON &amp; CSV downloads.</p>
+        <p id="home-status" class="load-status" role="status" aria-live="polite">Loading available collections…</p>
+        <button id="retry" class="retry" type="button" hidden>Retry loading collections</button>
+        <noscript><p class="load-status">Enable JavaScript to choose a collection, or <a href="/api/snapshots/catalog">open the JSON catalog</a>.</p></noscript>
+      </div>
+      <div>
+        <section class="sample" aria-label="Selected captured collection" aria-busy="true">
+          <div class="sample-top">
+            <div class="sample-top-line"><strong>Selected collection</strong><span id="sample-weekday"></span></div>
+            <div class="sample-date"><strong id="sample-day">—</strong><div><b id="sample-month">A captured day</b><span id="sample-year"></span></div></div>
+            <h2 id="sample-community">Your community</h2>
+          </div>
+          <div class="sample-evidence"><p class="section-label" id="sample-label">Collection preview</p><h3 id="sample-title">Choose a day. Follow its conversation.</h3><div id="sample-details" class="details"></div></div>
+          <div id="sample-foot" class="sample-foot" hidden><span><strong id="sample-posts"></strong> captured posts</span><span><strong id="sample-comments"></strong> retained comments</span></div>
+        </section>
+        <p id="sample-note" class="sample-note">The exact UTC collection window appears with each snapshot.</p>
+      </div>
+    </section>
+    <div class="content">
+      <div class="availability"><p id="availability">Find your community in the available collections.</p><span id="date-range">Collection dates, with their limits intact.</span></div>
+      <section id="glimpse" class="explore" hidden>
+        <div class="explore-head"><h2>A glimpse of the day.</h2><p id="glimpse-note"></p></div>
+        <div id="preview-posts"></div>
+        <a id="all-posts" class="plain-link"></a>
+      </section>
+    </div>
+    <section class="how" id="how">
+      <div><p class="section-label">From a day to its details</p><h2>The evidence.<br>The context.<br>Yours to explore.</h2></div>
+      <div class="explanation">
+        <article><h3>Choose a collection</h3><p>Pick a subreddit and an available day. Each snapshot shows the exact UTC window behind its collection date.</p></article>
+        <article><h3>Follow what stood out</h3><p>Find notable posts, recorded engagement and retained discussion. Open the source whenever you want the original context.</p></article>
+        <article><h3>Take the data with you</h3><p>Share a link to the exact capture or download its posts and comments as JSON or CSV. No account required.</p></article>
+      </div>
+    </section>
+    <footer><a class="brand" href="/">Reddit Insights</a><p>Captured records, with their limits intact.<br>Source posts remain on Reddit. Retained comments are filtered.</p><a href="#lookup">Find a snapshot ↗</a></footer>
+  </main>
+</body>
+</html>

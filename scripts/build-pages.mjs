@@ -3,12 +3,12 @@
 import { spawn } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DISPLAY_DIR = join(ROOT, "data", "reddit-display");
-const DIST_DIR = join(ROOT, "dist");
+const DIST_DIR = process.env.PAGES_OUTPUT_DIR ? resolve(process.env.PAGES_OUTPUT_DIR) : join(ROOT, "dist");
 const INDEX_FILE = join(DISPLAY_DIR, "index.json");
 const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
@@ -115,7 +115,6 @@ try {
   });
   await waitForServer();
 
-  let defaultHtml = "";
   for (const community of communities) {
     const response = await fetch(`http://127.0.0.1:${PORT}/?subreddit=${encodeURIComponent(community)}&period=all`);
     if (!response.ok) throw new Error(`Failed to render r/${community}: HTTP ${response.status}`);
@@ -127,10 +126,16 @@ try {
       join(DIST_DIR, "r", community, "index.md"),
       `# Reddit Insights — r/${community}\n\nThis page compares the ranked historical canon and the inferred recent candidate pool in the collected r/${community} evidence. It shows what became prominent, what persisted, and what is currently breaking through.\n\nThe archive is not a census of all subreddit activity. Ranked records cannot estimate total historical publishing or whole-conversation prevalence, and the recent boundary is inferred when original retrieval provenance was not retained. Open the HTML research view for source-linked posts, exact coverage, and methodology.\n\n- [Open the research view](${ORIGIN}/r/${encodeURIComponent(community)}/)\n- [Read the full collection contract](${ORIGIN}/llms-full.txt)\n`,
     );
-    if (community === defaultCommunity) defaultHtml = html;
   }
 
-  writeFileSync(join(DIST_DIR, "index.html"), defaultHtml);
+  // Snapshot HTML contains no data. Private exports are served only by the API.
+  mkdirSync(join(DIST_DIR, "snapshots"), { recursive: true });
+  mkdirSync(join(DIST_DIR, "snapshots", "fonts"), { recursive: true });
+  for (const file of ["index.html", "style.css", "theme.css", "home.css", "app.mjs", "paths.mjs", "insights.mjs", "home.mjs", "home-model.mjs", "fonts/archivo.woff2", "fonts/Archivo-OFL.txt"]) {
+    copyFileSync(join(ROOT, "scripts", "snapshots", "viewer", file), join(DIST_DIR, "snapshots", file));
+  }
+  copyFileSync(join(ROOT, "scripts", "snapshots", "viewer", "home.html"), join(DIST_DIR, "index.html"));
+  writeFileSync(join(DIST_DIR, "_redirects"), "/r/:community/:date/:version/ /snapshots/ 200\n/r/:community/:date/ /snapshots/ 200\n");
   // Missing/unpublished communities must not masquerade as the default corpus.
   const unavailableHtml = `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Community unavailable · Reddit Insights</title><style>body{margin:0;background:#10151e;color:#edf1f7;font:16px/1.6 system-ui,sans-serif}main{max-width:56rem;margin:8vh auto;padding:24px}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15}p{max-width:65ch;color:#b5bfce}a{color:#78baff}a:focus-visible{outline:2px solid currentColor;outline-offset:4px}ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:12px;list-style:none;padding:0}li a{display:block;padding:10px 12px;border:1px solid #354256;border-radius:8px;overflow-wrap:anywhere}</style></head><body><main><p>Reddit Insights</p><h1>This community page is unavailable.</h1><p>The requested page is missing or has not been published. No other community's analysis has been substituted. Choose one of the available collected communities below.</p><p><a href="/">Open the default research view</a></p><h2>Available communities</h2><ul>${communities.map(community => `<li><a href="/r/${encodeURIComponent(community)}/">r/${community.replaceAll("&", "&amp;").replaceAll("<", "&lt;")}</a></li>`).join("")}</ul></main></body></html>`;
   writeFileSync(join(DIST_DIR, "404.html"), unavailableHtml);
@@ -142,18 +147,23 @@ try {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${communities.map(community => `<url><loc>${ORIGIN}/r/${encodeURIComponent(community)}/</loc></url>`).join("")}</urlset>\n`,
   );
   writeFileSync(join(DIST_DIR, "llms.txt"), `# Reddit Insights\n\nEvidence-bounded research views over collected Reddit community activity.\n\n- ${ORIGIN}/index.md\n- ${ORIGIN}/llms-full.txt\n- ${ORIGIN}/api/ai\n`);
-  writeFileSync(join(DIST_DIR, "llms-full.txt"), `# Reddit Insights\n\nReddit Insights is a static, evidence-bounded top-content observatory. It compares an available ranked historical canon with an inferred recent candidate pool, preserves source links, and discloses the sampling limits on every community view. Coverage does not imply platform-wide completeness, whole-conversation prevalence, or causal evidence.\n\n## Community views\n\n${communities.map(community => `- [r/${community}](${ORIGIN}/r/${encodeURIComponent(community)}/index.md)`).join("\n")}\n`);
-  writeFileSync(join(DIST_DIR, "index.md"), `# Reddit Insights\n\nReddit Insights studies what became prominent, what persisted, and what is currently breaking through in collected subreddit evidence. It compares a ranked historical canon with an inferred recent candidate pool and keeps every finding traceable to source posts.\n\nThe archive is not a census of Reddit activity. Historical claims are bounded by the retained ranked sample, and recent observations remain one-source evidence until High Signal corroborates them across providers.\n\n- [Open the default research view](${ORIGIN}/r/${encodeURIComponent(defaultCommunity)}/)\n- [Browse the machine-readable community index](${ORIGIN}/llms-full.txt)\n`);
+  writeFileSync(join(DIST_DIR, "llms-full.txt"), `# Reddit Insights\n\nReddit Insights provides subreddit/collection-date snapshots with source links, filtered retained comments and JSON/CSV exports. Snapshot serving requires configured private derivatives and the API; unavailable dates never fall back to historical data. The historical observatory compares an available ranked historical canon with an inferred recent candidate pool, preserves source links, and discloses the sampling limits on every community view. Coverage does not imply platform-wide completeness, whole-conversation prevalence, or causal evidence.\n\n## Community views\n\n${communities.map(community => `- [r/${community}](${ORIGIN}/r/${encodeURIComponent(community)}/index.md)`).join("\n")}\n`);
+  writeFileSync(join(DIST_DIR, "index.md"), `# Reddit Insights\n\nReddit Insights lets people inspect and share captured subreddit activity by collection date. Open /snapshots/ to select a community/day and download the same bounded evidence. Each collection shows its exact UTC window; retained comments are filtered. The historical research views study what became prominent, what persisted, and what is currently breaking through in collected subreddit evidence. It compares a ranked historical canon with an inferred recent candidate pool and keeps every finding traceable to source posts.\n\nThe archive is not a census of Reddit activity. Historical claims are bounded by the retained ranked sample, and recent observations remain one-source evidence until High Signal corroborates them across providers.\n\n- [Open the default research view](${ORIGIN}/r/${encodeURIComponent(defaultCommunity)}/)\n- [Browse the machine-readable community index](${ORIGIN}/llms-full.txt)\n`);
   mkdirSync(join(DIST_DIR, "api"), { recursive: true });
   const agentCatalog = `${JSON.stringify({
     name: "Reddit Insights",
     url: ORIGIN,
-    description: "Evidence-bounded research views over ranked subreddit canon and inferred recent candidates.",
+    description: "Subreddit/collection-date snapshots with source evidence and JSON/CSV downloads, alongside historical research views.",
     llms: `${ORIGIN}/llms.txt`,
     llmsFull: `${ORIGIN}/llms-full.txt`,
     sitemap: `${ORIGIN}/sitemap.xml`,
     markdown: `${ORIGIN}/index.md`,
     surfaces: [{
+      id: "daily-snapshots",
+      url: `${ORIGIN}/snapshots/`,
+      catalog: `${ORIGIN}/api/snapshots/catalog`,
+      description: "Captured subreddit/day posts and retained discussion; requires configured snapshot storage.",
+    }, {
       id: "community-research",
       url: `${ORIGIN}/r/{community}/`,
       md: `${ORIGIN}/r/{community}/index.md`,
@@ -206,6 +216,9 @@ try {
   Content-Type: text/javascript; charset=utf-8
   Cache-Control: public, max-age=86400, immutable
 
+/snapshots/*.mjs
+  Content-Type: text/javascript; charset=utf-8
+
 /data/*
   Cache-Control: public, max-age=86400, immutable
 
@@ -213,7 +226,7 @@ try {
   Content-Type: application/json; charset=utf-8
   Content-Encoding: gzip
 `);
-  console.log(`Built ${communities.length} static community routes and ${publishedRows.length} searchable corpus chunks in dist/.`);
+  console.log(`Built snapshot shell, ${communities.length} historical routes and ${publishedRows.length} searchable corpus chunks in ${DIST_DIR}.`);
 } finally {
   if (server && !server.killed) server.kill("SIGTERM");
   rmSync(temporaryDataDir, { recursive: true, force: true });

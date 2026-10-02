@@ -2,7 +2,8 @@
   "$schema": "fleet.design-review.v1",
   "version": 1,
   "project": "reddit-insights",
-  "target": "Reddit research dashboard",
+  "target": "Landing page visual redesign",
+  "surfaceMode": "persuade",
   "mode": "overhaul",
   "register": "product",
   "context": {
@@ -11,69 +12,207 @@
   },
   "direction": {
     "references": [
-      "contemporary data journalism",
-      "professional research studios",
-      "interactive scientific observatories"
+      "Preline free editorial split/product stage",
+      "Preline free centered hero",
+      "Existing verified community/day snapshot data and native controls"
     ],
     "probes": [
       {
-        "id": "topic-river-studio",
-        "path": "artifacts/design/research-studio-probes/topic-river-studio.png"
+        "id": "snapshot-studio",
+        "path": "artifacts/design/landing-directions/a-1440.png",
+        "purpose": "Show the snapshot product clearly and initiate community/day lookup.",
+        "audience": "Operator, community researchers and snapshot recipients",
+        "screenJob": "Recognize the product and open one collection",
+        "visualThesis": "Bright product studio with the captured day as the proof artifact",
+        "layout": "Asymmetric display/form and blue date/discussion stage; source list follows",
+        "typography": "Archivo800display88px;400body18px;600evidence25px",
+        "colorRoles": "Pale paper, navy text, cobalt action and capture stage",
+        "interactionThesis": "Select community/day immediately; open example or follow source rows",
+        "signature": "Large dated collection stage coupled to a real most-discussed thread",
+        "risk": "Generous display takes more vertical space on phone; CTA remains visible."
       },
       {
-        "id": "radial-observatory",
-        "path": "artifacts/design/research-studio-probes/radial-observatory.png"
+        "id": "daily-dispatch",
+        "path": "artifacts/design/landing-directions/b-1440.png",
+        "purpose": "Make captured community conversations approachable and worth reading.",
+        "audience": "Operator, curious readers and snapshot recipients",
+        "screenJob": "Choose a day and begin reading its notable conversation",
+        "visualThesis": "Confident publication with a yellow opening and day stamp",
+        "layout": "Full-width message/date opening, horizontal lookup dock, asymmetric discussion story",
+        "typography": "Chivo800display92px;500thread36px;400body18px",
+        "colorRoles": "Yellow page-scale opening, ink controls, white reading field, ink lower evidence list",
+        "interactionThesis": "Read this day; notable discussion becomes the next visual act",
+        "signature": "Example collection date beside the opening question and discussion-led preview",
+        "risk": "Most thread proof follows the first phone viewport; selector/action stay visible."
       },
       {
-        "id": "data-story-matrix",
-        "path": "artifacts/design/research-studio-probes/data-story-matrix.png"
+        "id": "open-archive",
+        "path": "artifacts/design/landing-directions/c-1440.png",
+        "purpose": "Make the archived collection and open data immediately understandable.",
+        "audience": "Operator, researchers and data recipients",
+        "screenJob": "Locate a collection, inspect its contents and access its data",
+        "visualThesis": "Composed open archive with the product itself as proof",
+        "layout": "Centered forest introduction/lookup above a full-width source list; export section follows",
+        "typography": "Archivo600display78px;600post18px;400body17px",
+        "colorRoles": "Forest introduction, sage primary action, white evidence canvas",
+        "interactionThesis": "Lookup opens collection; preview rows and explicit download lead into existing reader/data",
+        "signature": "Full-width real collection preview emerges from the introductory field",
+        "risk": "Closer to a familiar application landing; distinctive character rests on type and evidence."
       }
     ],
-    "selected": "data-story-matrix",
-    "approval": "delegated",
-    "before": ""
+    "selected": "snapshot-studio",
+    "approval": "approved",
+    "before": "artifacts/design/landing-directions/before-public-1440.png",
+    "library": {
+      "strategy": "upstream-first",
+      "primary": "preline",
+      "sources": [
+        "https://preline.co/blocks/marketing/hero-sections/iframes/free/editorial-split-hero-with-product-stage.html",
+        "https://preline.co/blocks/marketing/hero-sections/iframes/free/center-aligned-dark-hero.html",
+        "https://preline.co/license.html"
+      ],
+      "runtime": "existing",
+      "customReplacement": {
+        "used": false,
+        "authorization": "not-required",
+        "reason": "Adapt free upstream layout/semantic patterns and retain project-native forms, links and snapshot behavior. No new production dependency."
+      }
+    },
+    "contract": {
+      "purpose": "Reddit Insights helps people inspect and share captured subreddit/day evidence through a date-addressable snapshot with source links and reconciled downloads.",
+      "purposeSource": "Owner instructions in this session; issue #21; existing PRODUCT.md and archive receipts.",
+      "canonicalPurpose": "A documented experiment answering one historical community question.",
+      "purposeAlignment": "repository-override",
+      "driftNote": "PRODUCT.md and DESIGN.md record the authorized snapshot purpose and owner-approved Snapshot Studio. Site Health production catalog still describes the earlier experiment and points at fleet-archive; production config changes and deployment are outside this task and must be reconciled before release.",
+      "audience": "The Fleet operator and anyone receiving a shared snapshot.",
+      "job": "Understand what a subreddit/day snapshot contains, select a community and collection date, then inspect/share/download the evidence.",
+      "thesis": "A recognisable landing front door with real captured-data proof and immediate community/day lookup.",
+      "system": "Snapshot Studio: pale paper, navy ink, cobalt actions and dated proof stage; self-hosted Archivo; asymmetric lookup and actual captured-post preview. Native controls and quiet reading surfaces.",
+      "signature": "Each direction exposes the actual Oct1 AI_Agents capture and a direct route to71posts/350retainedcomments.",
+      "risk": "Homepage may overstate archive completeness or current availability; all directions identify example capture, available collection dates and filtering. No production availability claim."
+    }
   },
   "evidence": {
     "screenshots": [
       {
         "width": 390,
-        "path": "artifacts/design/after-390.png"
+        "path": "artifacts/design/snapshot-studio/home-390.png",
+        "stage": "browser-after-home"
       },
       {
         "width": 768,
-        "path": "artifacts/design/after-768.png"
+        "path": "artifacts/design/snapshot-studio/home-768.png",
+        "stage": "browser-after-home"
       },
       {
         "width": 1440,
-        "path": "artifacts/design/after-1440.png"
+        "path": "artifacts/design/snapshot-studio/home-1440.png",
+        "stage": "browser-after-home"
+      },
+      {
+        "width": 390,
+        "path": "artifacts/design/snapshot-studio/reader-390.png",
+        "stage": "browser-after-reader"
+      },
+      {
+        "width": 768,
+        "path": "artifacts/design/snapshot-studio/reader-768.png",
+        "stage": "browser-after-reader"
+      },
+      {
+        "width": 1440,
+        "path": "artifacts/design/snapshot-studio/reader-1440.png",
+        "stage": "browser-after-reader"
       }
     ],
     "projectCheck": {
-      "command": "node --check scripts/reddit-research-studio.mjs && node --check scripts/reddit-memory-ui.mjs && npm run test:display && git diff --check && openspec validate compact-all-community-reports --strict && openspec validate overhaul-reddit-research-workbench --strict",
-      "status": "pass"
+      "command": "npm run test:snapshots; isolated npm run build:pages and npm test; format:check; lint; typecheck; source syntax; final Pages asset checks",
+      "status": "pass",
+      "logs": [
+        "artifacts/design/snapshot-studio/qualification.json"
+      ]
     },
     "critique": {
-      "score": 39,
-      "maximum": 40
+      "score": 33,
+      "maximum": 40,
+      "path": ".impeccable/critique/2026-10-02T11-52-23Z__scripts-snapshots-viewer-home-html.md",
+      "method": "Independent A/B and fresh finish follow-up after P2 fixes"
     },
     "audit": {
-      "score": 19,
-      "maximum": 20
+      "score": 16,
+      "maximum": 20,
+      "path": ".impeccable/critique/2026-10-02T11-52-23Z__scripts-snapshots-viewer-home-html.md"
     },
     "unresolved": {
       "p0": 0,
-      "p1": 0
+      "p1": 0,
+      "p2": 1
     },
     "detector": {
       "posture": "advisory",
+      "cli": {
+        "runs": 1,
+        "exitCode": 2,
+        "findings": [
+          {
+            "rule": "side-tab",
+            "file": "scripts/snapshots/viewer/style.css",
+            "line": 5,
+            "assessment": "False positive: neutral captured reply hierarchy"
+          }
+        ]
+      },
+      "browser": {
+        "injection": "pass",
+        "views": 3,
+        "reports": 21,
+        "cleanup": "detector server stopped"
+      },
       "findings": [
-        "Final distillation detector reported 8 advisory-only findings: 2 intentional overlay colors, 3 fluid display clamp endpoints, and 3 visualization microcell radii",
-        "Browser verification passed strong LocalLLaMA, limited recruiting, and sparse IndiaPersonalFinance at 390, 768, and 1440 with no overflow or runtime errors; unsupported canon, topic, and comparison views are withheld"
+        {
+          "rule": "single-font",
+          "assessment": "Approved Archivo hierarchy"
+        },
+        {
+          "rule": "line-length",
+          "assessment": "Advisory; actual prose and expiry information"
+        },
+        {
+          "rule": "text-occlusion / first-viewport-column-overflow",
+          "assessment": "False positives: collapsed content / intentional reader sidebar"
+        }
       ]
-    }
+    },
+    "comprehension": {
+      "status": "pass",
+      "reviewer": "Independent impeccable_finish_reviewer; actual390/768/1440 renders",
+      "answers": {
+        "product": "Captured Reddit subreddit/day snapshot viewer",
+        "audience": "Community inspectors and shared snapshot recipients",
+        "value": "Inspect discussion and take captured data with you",
+        "mechanism": "Choose community/date; open captured posts and retained discussion",
+        "proof": "Live dated collection, captured/retained counts and recorded replies",
+        "nextAction": "Open snapshot; share pinned capture or download JSON/CSV"
+      },
+      "purposeScore": {
+        "product": 24,
+        "audience": 13,
+        "value": 14,
+        "mechanism": 15,
+        "proof": 8,
+        "nextAction": 15,
+        "total": 89
+      },
+      "mismatches": []
+    },
+    "limitations": [
+      "Local only; production R2/source/export refresh/removal/cleanup/runtime release gates remain.",
+      "Small secondary desktop calendar cells have larger native date controls.",
+      "Mobile proof follows lookup as approved; captured text retains raw Markdown."
+    ]
   },
   "ownerFeedback": {
     "decision": "keep",
-    "note": "Owner approved the top-content direction and asked for credibility over chart volume, then requested all-community coverage with compact display data. The compact layer covers all 113 collected communities while visibly separating core, limited, and sparse analysis availability. Sparse corpora now use a source-only profile; unenriched corpora withhold topic comparisons. Final browser audit has zero P0/P1 issues."
+    "note": "Owner said ok go for it after recommendation of A Snapshot Studio. Implement this approved system on the homepage and daily reader; no release authorized."
   }
 }

@@ -1,7 +1,10 @@
 ---
 name: Reddit Insights
-description: A living research studio for Reddit community evolution
+description: Snapshot Studio for daily evidence, with a separate historical observatory
 colors:
+  snapshotPaper: "#f8faff"
+  snapshotInk: "#182440"
+  snapshotAction: "#3159e8"
   void: "#060913"
   studio: "#0b1120"
   panel: "#10192b"
@@ -48,7 +51,45 @@ spacing:
   section: "72px"
 ---
 
+# Daily snapshots — Snapshot Studio
+
+Approved by the owner on October 2, 2026: direction A, Snapshot Studio.
+
+**Purpose and audience.** Help the operator and shared-link recipients understand, inspect and share a captured subreddit/day collection.
+**Design thesis.** Bright paper, confident navy type and a cobalt date stage make the captured day the product's proof.
+**System.** Self-hosted Archivo (400–800), oversized display type, asymmetric lookup/proof composition, native selects, open evidence rows and a light reader. Paper #f8faff, ink #182440, muted #5b6680, rule #d8deeb, action/focus #3159e8, control #78869f, white fields. Display tracking is no tighter than -.035em; metadata stays at least 13px. Phone lookup comes before proof; tablet keeps word spacing when reflowing the headline.
+**Signature.** The community/date form controls a real API-backed collection preview. Never bake private posts or counts into static HTML.
+**Acceptance.** Match approved A at phone and desktop; keep exact UTC windows, expiry, empty/error/partial states, clean routes, scroll/focus behavior and reconciled exports. No new dependency, commit or deploy.
+
+This system applies to the homepage and daily snapshot reader. The historical observatory below keeps its established design.
+
+
+---
+
 # Design System: Reddit Insights
+
+## Daily snapshot surface
+
+The primary snapshot task is community/date lookup, captured evidence and open
+sharing. The earlier dark Calendar archive visual direction was superseded by the owner-approved Snapshot Studio above on October 2, 2026. Its calendar and reading behavior are retained in the new light system.
+Desktop uses a collection calendar sidebar and searchable post list; mobile
+uses native community/date controls and earlier/later available collections.
+Unavailable calendar days are disabled. Keep the exact UTC source window,
+captured/retained counts and filtering limits visible. Discussion inspection
+uses a native dialog with a close action and source link. Downloads and sharing
+preserve the selected collection identity; missing dates never substitute the
+historical corpus. Analytical copy stays at least 13px.
+
+Preserve these interaction rules for clean date/version paths and the “What stood out”
+disclosure. Its collapsed summary keeps captured posts close to the first
+viewport; expanded findings link directly to retained evidence. Name post labels
+and recorded engagement literally. Gate daily comparisons on comparable coverage.
+Desktop date navigation stays available while reading; long dialogs contain their
+own scroll, keep Close visible, reset for the next thread and return focus on exit.
+Loading more posts appends rows without moving the reader's position.
+
+The historical observatory rules below still apply to `/r/<subreddit>/`;
+its comment exclusion does not apply to the new daily snapshot reader.
 
 ## Creative North Star
 

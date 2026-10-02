@@ -1,6 +1,7 @@
 # Reddit Insights
 
-Ingest, analyze, and visualize Reddit subreddit activity.
+Inspect captured subreddit activity by collection date, share a snapshot and
+download its posts and retained comments. Historical research views remain available.
 
 Product direction: [product requirements](PRD.md).
 
@@ -11,6 +12,54 @@ npm install
 ```
 
 ## Usage
+
+The snapshot viewer is implemented locally; production integration is pending
+([issue #21](https://github.com/High-Signal-App/research-subreddit/issues/21)).
+Prepare a verified daily v2 archive directory, then start the viewer:
+
+```bash
+npm run snapshots:import -- --archive-dir /path/to/daily-archive
+npm run snapshots:ui
+```
+
+Open `http://127.0.0.1:7425/` for Snapshot Studio; `/snapshots/` opens the reader. Repeat the import for additional dates.
+Direct lookup uses `/r/AI_Agents/2026-10-01/`. Copy snapshot link adds a short
+version path, for example `/r/AI_Agents/2026-10-01/a375b450cf23/`, to preserve
+the exact captured revision. Earlier query-string links still work and normalize
+to the clean path; full run/revision identity remains in exports.
+The directory must contain `manifest.json`, `subreddits.index.json`, and the
+posts/comments/events `.jsonl.zst` packs. Native `zstd` must be installed on the
+trusted import runner. The importer verifies all pack/index SHA-256 receipts,
+line/byte partitions, identities, collection windows and counts before creating
+minimized gzip derivatives in gitignored `artifacts/daily-snapshots/`.
+
+The date is the **collection date**, with its exact half-open UTC window shown.
+Comments are filtered, and scores/reply totals are recorded at capture time.
+Author/profile metadata is omitted; text may still mention people. JSON includes
+coverage; both CSV files include collection identity and safely quote text.
+Search filters the viewer; downloads contain the whole selected snapshot.
+
+“What stood out” summarizes the highest recorded score, most reported replies,
+median score, low-score count and post-label mix, with links to the evidence.
+Removed posts are excluded. These are captured-record observations, not inferred
+topics or sentiment. Previous captured-post counts are compared only for complete,
+uncapped, non-redacted 24-hour windows aligned within one minute. Filtered comment
+counts are not compared because their filter-policy provenance is absent.
+
+Share URLs resolve the full source identity from a unique 12-character revision
+prefix; ambiguous prefixes fail explicitly. Exports expire after 24 hours and
+must be refreshed from the authoritative private archive. Re-importing a redacted
+run replaces its catalog entries; old revisions become unavailable even if old
+files remain on disk. Removing a catalog entry revokes access immediately.
+Responses use `no-store`. Expired files are not automatically deleted; retention
+and upstream redaction refresh must be wired before production use. Import into
+one private directory with a single writer, never directly into `dist/`.
+
+```bash
+npm run test:snapshots
+```
+
+### Historical research pipeline
 
 Run the full pipeline for a subreddit:
 
@@ -47,8 +96,19 @@ deployments.
 
 ## Cloudflare Pages
 
-The public observatory is exported as static HTML. It does not require Pages
-Functions or a deployed database.
+The build exports the snapshot shell at `/` and `/snapshots/`, and preserves
+static historical research pages at `/r/<subreddit>/`. Historical pages work
+without a database. The new snapshot API requires Pages Functions and a private
+R2 binding named `SNAPSHOT_EXPORTS`; absent storage is an explicit unavailable state.
+
+The adapter reads only `reddit-insights/exports/v1/index.json` and catalogued
+minimized derivatives beneath that prefix. Upload the gzip derivatives first
+and the catalog last in a separately authorized release. It does not read or
+publish the raw archive. Configure automatic refresh/expiry/removal handling,
+restore the currently unavailable R2 account, and reconcile the actual deployed
+source checkout before releasing. None of those production steps were performed
+as part of the local implementation. Source tests cover the shared Web API and
+binding adapter; Cloudflare runtime/binding qualification remains a release gate.
 
 ```bash
 npm run build:pages
@@ -61,7 +121,8 @@ Configure the Pages project with:
 - Node.js: 22 or newer
 
 The build creates `/r/<subreddit>/` for every active community in the curated roster.
-Only `dist/` is uploaded. It includes the curated communities’ compact gzip
+`dist/` contains static assets; Pages Functions are built separately from `functions/`.
+The static output includes the curated communities’ compact gzip
 search chunks under `/data/`, containing the collected post titles, bodies and
 source links used by browser search. Raw research directories, reports, caches
 and embeddings remain outside the deployed output; excluded communities are

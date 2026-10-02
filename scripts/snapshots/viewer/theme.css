@@ -1,0 +1,2 @@
+@font-face{font-family:Archivo;src:url("/snapshots/fonts/archivo.woff2") format("woff2");font-style:normal;font-weight:400 900;font-display:swap}
+:root{color-scheme:light;--paper:#f8faff;--ink:#182440;--muted:#5b6680;--rule:#d8deeb;--action:#3159e8;--action-ink:#fff;--focus:#3159e8;--control:#78869f;--field:#fff;--capture-muted:#e3e9ff;--soft:#f2f5fb}
