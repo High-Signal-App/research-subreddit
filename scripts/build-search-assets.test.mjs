@@ -23,6 +23,11 @@ test("snapshot entry point ships its controller without copying private archive 
   assert.match(home, /id="lookup"[^>]*data-app-health-event="snapshot_lookup_submitted"/);
   assert.match(home, /src="\/app-health-log\.js"/);
   assert.match(home, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/);
+  const trackerKey = home.match(/https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-key="(ahk_pub_[A-Za-z0-9_-]+)"/)?.[1];
+  const loggerSource = readFileSync(join(DIST, "app-health-log.js"), "utf8");
+  const loggerKey = loggerSource.match(/var KEY = '(ahk_pub_[A-Za-z0-9_-]+)'/)?.[1];
+  assert.ok(trackerKey && loggerKey, "homepage tracker and browser logger must both carry a public key");
+  assert.equal(loggerKey, trackerKey, "browser logs must use the existing tracker key scoped to this product origin");
   assert.doesNotMatch(home, /newsletter-capture|project-strip|ai-chat-footer/);
   assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
   assert.match(readFileSync(join(DIST, "snapshots", "index.html"), "utf8"), /src="\/snapshots\/app.mjs"/);
