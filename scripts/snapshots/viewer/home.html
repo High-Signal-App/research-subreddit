@@ -27,7 +27,7 @@ FORM: Owner-approved A Snapshot Studio, asymmetric split/product stage. Approved
         <p class="section-label">A view into your communities.</p>
         <h1>Reddit,<br>one day<br> <span>at a time.</span></h1>
         <p class="lede">See what a subreddit was talking about. Explore captured posts, follow the discussion, and take the data with you.</p>
-        <form id="lookup" class="lookup" action="/snapshots/" method="get">
+        <form id="lookup" class="lookup" action="/snapshots/" method="get" data-app-health-event="snapshot_lookup_submitted">
           <label>Subreddit<select id="home-community" name="subreddit" disabled><option>Loading communities…</option></select></label>
           <label>Collection date<select id="home-date" name="date" disabled><option>Loading dates…</option></select></label>
           <button id="open-snapshot" type="submit" disabled>Open snapshot <span aria-hidden="true">↗</span></button>
