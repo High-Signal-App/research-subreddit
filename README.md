@@ -13,7 +13,7 @@ npm install
 
 ## Usage
 
-Snapshot Studio's release target is https://reddit-insights.highsignal.app/;
+Open Snapshot Studio at https://reddit-insights.highsignal.app/;
 [issue #21](https://github.com/High-Signal-App/research-subreddit/issues/21)
 records release acceptance. To run locally, prepare a verified daily v2 archive
 directory, then start the viewer:

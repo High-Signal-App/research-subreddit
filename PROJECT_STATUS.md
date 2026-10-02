@@ -2,11 +2,14 @@
 
 Updated October 2, 2026. Tracking: [snapshot feature #21](https://github.com/High-Signal-App/research-subreddit/issues/21).
 
-Snapshot Studio is committed, pushed and qualified for release. The owner
+Snapshot Studio is live at https://reddit-insights.highsignal.app/ with 198
+verified community/day snapshots: 99 communities on September 30 and October 1.
+Anonymous lookup, clean and pinned links, captured discussion, insights and
+JSON/posts CSV/comments CSV downloads pass public acceptance. The owner
 authorized the existing private R2 binding, automated collection/redaction
-refresh and seven-day cleanup of obsolete derivative objects. Public deployment
-acceptance is tracked in issue #21; the release target is
-https://reddit-insights.highsignal.app/.
+refresh and seven-day cleanup of obsolete derivative objects.
+[Release evidence](docs/release-2026-10-02.md) records source, CI, deployment and
+the successful automated refresh.
 
 The local snapshot viewer supports subreddit/collection-date selection,
 available-date navigation, recorded posts and retained discussion, search/sort,
@@ -45,4 +48,9 @@ preview titles open the chosen discussion in the pinned collection. Empty,
 failed, expired and unavailable collections keep their distinct states.
 The local homepage is at http://127.0.0.1:7425/.
 
-Snapshot Studio qualification:20 snapshot tests,57 full unit tests,112 display artifacts,26 enrichment checks,7 Pages artifact checks and format/lint/typecheck passed. Independent review33/40, audit16/20, lowest viewport purpose89/100; no unresolved P0/P1. Direction evidence and final screenshots remain under gitignored artifacts/design/.
+Snapshot Studio qualification: 23 snapshot tests, 66 full unit tests, 112 display
+artifacts, 26 enrichment checks, Pages export and format/lint/typecheck passed.
+Independent review 33/40, audit 16/20, lowest viewport purpose 89/100; no unresolved
+P0/P1. Public phone/desktop routes, contained discussion scrolling and close/focus
+return passed. Direction evidence and final screenshots remain under gitignored
+artifacts/design/.
