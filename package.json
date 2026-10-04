@@ -36,8 +36,11 @@
     "@huggingface/transformers": "^3.8.1",
     "@saas-maker/app-health": "https://github.com/sass-maker/app-health/releases/download/node-v0.4.0/saas-maker-app-health-0.4.0.tgz"
   },
+  "overrides": {
+    "sharp": "0.35.4"
+  },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.5",
