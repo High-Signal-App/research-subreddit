@@ -13,7 +13,9 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-const analyzeScript = fileURLToPath(new URL("../reddit-memory-analyze.mjs", import.meta.url));
+const analyzeScript = fileURLToPath(
+  new URL("../reddit-memory-analyze.mjs", import.meta.url),
+);
 
 test("invalid embedding cache falls back to recompute and preserves inputs if inference fails", (t) => {
   const root = mkdtempSync(join(tmpdir(), "reddit-analyze-fallback-"));
