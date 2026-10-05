@@ -78,7 +78,11 @@ test("invalid embedding cache falls back to recompute and preserves inputs if in
 
   assert.equal(result.error, undefined, result.error?.message);
   assert.equal(result.status, 1, result.stderr);
-  assert.match(result.stdout, /embedding cache: failed to load, starting fresh/, result.stderr);
+  assert.match(
+    result.stdout,
+    /embedding cache: failed to load, starting fresh/,
+    result.stderr,
+  );
   assert.match(result.stdout, /loading model\.\.\./);
   assert.match(result.stderr, /Failed: synthetic_model_load_failure/);
   assert.equal(readFileSync(sourceFile, "utf8"), sourceBytes);
