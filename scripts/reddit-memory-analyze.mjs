@@ -14,7 +14,7 @@
 
 import { pipeline } from "@huggingface/transformers";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { embeddingCacheFile, storageFile } from "./lib/paths.mjs";
 import { isQuestion } from "./lib/questions.mjs";
 import { cosine as cos, hashText } from "./lib/vectors.mjs";
