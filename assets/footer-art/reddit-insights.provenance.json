@@ -1,0 +1,17 @@
+{
+  "project": "reddit-insights",
+  "publicIntended": true,
+  "credit": "Original illustration for Reddit Insights",
+  "alt": "Reddit Insights: A community research bulletin board centers one unlettered day folder with a source-linked discussion card inside its boundary. Separate community drawers and empty unobserved-day slots make captured scope visible.",
+  "dimensions": {
+    "width": 2172,
+    "height": 724
+  },
+  "originalSha256": "abfe1e2b062823b060dba5adb175137a1baca6ff7a7301ebcc612d5d06e604e7",
+  "derivative": "reddit-insights.webp",
+  "derivativeSha256": "bf2ac20dedbae952868f879468c851773f0dc40291a43376990f3608fe1f950b",
+  "focalPointPercent": {
+    "x": 50,
+    "y": 50
+  }
+}

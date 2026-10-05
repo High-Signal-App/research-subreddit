@@ -22,3 +22,10 @@
 
 .shared-footer{max-width:1280px;margin:0 auto 32px}.shared-footer saas-maker-newsletter-capture{--newsletter-capture-text:var(--ink);--newsletter-capture-muted:var(--muted);--newsletter-capture-border:var(--rule);--newsletter-capture-surface:var(--field);--newsletter-capture-focus:var(--focus);--newsletter-capture-action:var(--action);--newsletter-capture-action-text:var(--action-ink)}
 @media(max-width:1380px){.shared-footer{margin-left:5%;margin-right:5%}}
+footer.reddit-insights-footer{display:block;width:100%;max-width:none;margin:0;padding:0;border:0;color:inherit}
+.research-footer-native{display:grid;gap:10px;min-width:0}
+.research-footer-native p{max-width:62ch;margin:0;color:var(--muted)}
+.research-footer-native .research-footer-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+.research-footer-native a{min-height:44px;display:inline-flex;align-items:center;color:var(--action);text-underline-offset:3px}
+.reddit-insights-footer .research-footer-native .brand{font-size:21px;font-weight:800;letter-spacing:-.035em;white-space:nowrap}
+@media(max-width:600px){.research-footer-native .research-footer-links{display:grid;gap:0}.reddit-insights-footer .research-footer-native .brand{font-size:18px}}
