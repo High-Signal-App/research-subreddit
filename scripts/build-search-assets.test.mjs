@@ -10,7 +10,7 @@ import test from "node:test";
 const ROOT = process.cwd();
 const DIST = process.env.PAGES_OUTPUT_DIR || join(ROOT, "dist");
 const DIST_DATA = join(DIST, "data");
-const skip = existsSync(DIST_DATA) ? false : "dist/data is absent — run npm run build:pages first";
+const skip = existsSync(DIST_DATA) ? false : "dist/data is absent — run pnpm run build:pages first";
 
 const index = JSON.parse(readFileSync(join(ROOT, "data", "reddit-display", "index.json"), "utf8"));
 const roster = JSON.parse(readFileSync(join(ROOT, "config", "community-roster.json"), "utf8"));

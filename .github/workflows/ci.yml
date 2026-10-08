@@ -12,24 +12,26 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm run quality
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run quality
 
   static-export:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm run build:pages
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:pages
       - name: Verify search discovery output
         run: |
           # Take the canary from the index rather than naming a community. A

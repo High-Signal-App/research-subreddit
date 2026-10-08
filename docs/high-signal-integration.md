@@ -31,7 +31,7 @@ unrelated popular posts as evidence for a trend.
 
 ## Migration-only archive import
 
-`npm run import:high-signal -- --events <events.jsonl.zst> --pointer <latest.json>
+`pnpm run import:high-signal -- --events <events.jsonl.zst> --pointer <latest.json>
 --output-dir <temporary-directory> [--render <subreddit>]` converts the bounded
 daily event stream into derived gzip display corpora. The output declares its
 exact archive window and `rawArchiveDuplicated: false`; it is disposable and
