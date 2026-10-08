@@ -65,7 +65,7 @@ function searchSection(community) {
 }
 
 if (!existsSync(INDEX_FILE)) {
-  throw new Error("Missing compact display index. Run npm run build:display first.");
+  throw new Error("Missing compact display index. Run pnpm run build:display first.");
 }
 const index = JSON.parse(readFileSync(INDEX_FILE, "utf8"));
 const roster = JSON.parse(readFileSync(ROSTER_FILE, "utf8"));

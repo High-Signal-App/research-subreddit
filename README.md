@@ -8,7 +8,7 @@ Product direction: [product requirements](PRD.md).
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Usage
@@ -19,8 +19,8 @@ records release acceptance. To run locally, prepare a verified daily v2 archive
 directory, then start the viewer:
 
 ```bash
-npm run snapshots:import -- --archive-dir /path/to/daily-archive
-npm run snapshots:ui
+pnpm run snapshots:import -- --archive-dir /path/to/daily-archive
+pnpm run snapshots:ui
 ```
 
 Open `http://127.0.0.1:7425/` for Snapshot Studio; `/snapshots/` opens the reader. Repeat the import for additional dates.
@@ -57,7 +57,7 @@ and upstream redaction refresh must be wired before production use. Import into
 one private directory with a single writer, never directly into `dist/`.
 
 ```bash
-npm run test:snapshots
+pnpm run test:snapshots
 ```
 
 ### Historical research pipeline
@@ -86,8 +86,8 @@ Open `http://localhost:7424` after the UI step.
 Build the deployable display corpus for every collected community:
 
 ```bash
-npm run build:display
-npm run test:display
+pnpm run build:display
+pnpm run test:display
 ```
 
 The generated `data/reddit-display/*.json.gz` files contain only fields used by
@@ -119,12 +119,12 @@ Source tests and a local Cloudflare runtime check qualify the binding adapter;
 release acceptance still requires anonymous live routes and download checks.
 
 ```bash
-npm run build:pages
+pnpm run build:pages
 ```
 
 Configure the Pages project with:
 
-- Build command: `npm run build:pages`
+- Build command: `pnpm run build:pages`
 - Build output directory: `dist`
 - Node.js: 22 or newer
 

@@ -5,7 +5,7 @@ This repository is independently operable. Run commands from the project root.
 ## Project
 
 - **Stack**: Node.js ES modules, `@huggingface/transformers`, vanilla HTML/SVG dashboard.
-- **Local dev**: `npm install` then `node scripts/reddit-memory-run.mjs <subreddit>`.
+- **Local dev**: `pnpm install` then `node scripts/reddit-memory-run.mjs <subreddit>`.
 - **Check**: Run the full pipeline and verify `http://localhost:7424` serves the dashboard.
 - **Deploy**: Manual; no automatic production deploy.
 

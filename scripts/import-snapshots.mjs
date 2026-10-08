@@ -6,7 +6,7 @@ import { loadArchive } from "./snapshots/archive.mjs";
 import { prepareSnapshots } from "./snapshots/publication.mjs";
 
 const { values } = parseArgs({ options: { "archive-dir": { type: "string" }, "output-dir": { type: "string", default: "artifacts/daily-snapshots" } } });
-if (!values["archive-dir"]) throw new Error("Usage: npm run snapshots:import -- --archive-dir <verified daily archive directory> [--output-dir <private derivatives directory>]");
+if (!values["archive-dir"]) throw new Error("Usage: pnpm run snapshots:import -- --archive-dir <verified daily archive directory> [--output-dir <private derivatives directory>]");
 const directory = resolve(values["output-dir"]);
 const snapshots = await loadArchive(resolve(values["archive-dir"]));
 const prepared = prepareSnapshots(snapshots);
