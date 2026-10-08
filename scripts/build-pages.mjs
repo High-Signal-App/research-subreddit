@@ -14,7 +14,7 @@ const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
-const footerCapture = `<saas-maker-newsletter-capture catalog-id="reddit-insights" product-name="Reddit Insights" kind="newsletter" source="footer" privacy-url="/privacy/" theme="dark"></saas-maker-newsletter-capture>`;
+const footerCapture = `<saas-maker-newsletter-capture slot="capture" catalog-id="reddit-insights" product-name="Reddit Insights" kind="newsletter" source="footer" privacy-url="/privacy/" theme="dark"></saas-maker-newsletter-capture>`;
 const footerScripts = `<script src="/app-health-log.js" defer></script><script defer src="https://health.sassmaker.com/tracker.js" data-key="ahk_pub_5fd468bae12640af79faa6aa53f76cc7e453914551888aed55e73f0a7d762417" data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110" data-identity="session" data-endpoint="https://ingest.sassmaker.com/v1/browser"></script><script type="module" src="https://sassmaker.com/newsletter-capture.js"></script><script src="https://sassmaker.com/project-strip.js" data-project="reddit-insights" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js" data-name="Reddit Insights" crossorigin="anonymous" defer></script>`;
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
@@ -84,12 +84,17 @@ function staticHtml(html, community) {
   const withInstrumentedSources = html.replace(/<a\b(?=[^>]*\bhref=["']https?:\/\/(?:www\.)?reddit\.com\/)[^>]*>/gi, anchor =>
     /\bdata-app-health-event=/.test(anchor) ? anchor : anchor.replace(/>$/, ` data-app-health-event="source_thread_opened">`),
   );
-  if (!withInstrumentedSources.includes("</footer>")) throw new Error("Could not locate the research footer for the consented capture form.");
+  const footerStart = "<!-- reddit-insights:footer-start -->";
+  const footerEnd = "<!-- reddit-insights:footer-end -->";
+  if (withInstrumentedSources.split(footerStart).length !== 2 || withInstrumentedSources.split(footerEnd).length !== 2) {
+    throw new Error("Expected exactly one authored research footer anchor for the consented capture form.");
+  }
   return withInstrumentedSources
     .replace(dynamicNavigation, staticNavigation)
     .replace("</head>", `${metadata}${searchStyles}</head>`)
     .replace(SEARCH_ANCHOR, `<main>${searchSection(community)}${SEARCH_ANCHOR_TAIL}`)
-    .replace("</footer>", `${footerCapture}</footer>`)
+    .replace(footerStart, `<fleet-footer-extension data-fleet-footer-project="reddit-insights" product-name="Reddit Insights" art-src="https://sassmaker.com/footer-art/reddit-insights.webp" surface="app" theme="dark">${footerCapture}`)
+    .replace(footerEnd, "</fleet-footer-extension>")
     .replace("</body>", `<script type="module" src="/assets/browser/search-client.mjs"></script>${footerScripts}</body>`);
 }
 
