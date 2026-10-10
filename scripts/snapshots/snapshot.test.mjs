@@ -65,13 +65,28 @@ test("JSON and downloads reconcile to the same pinned collection; catalog hides 
   const response = await serveSnapshot(request("2026-10-01/Cloud?run=123&revision=" + snapshot.source.revision), get, now);
   assert.equal(response.status, 200); const data = await response.json(); assert.equal(data.posts.length, 1); assert.deepEqual(data.source, snapshot.source);
   assert.equal(response.headers.get("Cache-Control"), "no-store");
+  assert.match(response.headers.get("Server-Timing"), /^storage;dur=\d+, total;dur=\d+$/);
   const download = await serveSnapshot(request("2026-10-01/cloud?format=json&download=1"), get, now);
+  assert.equal(download.headers.get("Cache-Control"), "no-store");
+  assert.match(download.headers.get("Server-Timing"), /^storage;dur=\d+, total;dur=\d+$/);
   assert.match(download.headers.get("Content-Disposition"), /attachment/); assert.deepEqual((await download.json()).posts, snapshot.posts);
   for (const format of ["posts.csv", "comments.csv"]) {
     const csvResponse = await serveSnapshot(request(`2026-10-01/cloud?format=${format}`), get, now);
+    assert.equal(csvResponse.headers.get("Cache-Control"), "no-store");
+    assert.match(csvResponse.headers.get("Server-Timing"), /^storage;dur=\d+, total;dur=\d+$/);
     assert.equal(csvResponse.status, 200); const text = await csvResponse.text(); assert.match(text, /"run","revision","windowStart","windowEnd","coverageStatus"/); assert.doesNotMatch(text, /PRIVATE_|author/);
   }
   const catalog = await serveSnapshot(request("catalog"), get, now); assert.doesNotMatch(await catalog.text(), /\.json\.gz|"key"|"sha256"|"bytes"/);
+  assert.equal(catalog.headers.get("Cache-Control"), "public, max-age=60, s-maxage=300");
+  assert.match(catalog.headers.get("Server-Timing"), /^storage;dur=\d+, total;dur=\d+$/);
+});
+test("catalog errors remain no-store without successful-response timing", async () => {
+  for (const get of [null, async () => null, async () => { throw new Error("storage unavailable"); }, async () => new Blob(["invalid JSON"]).stream()]) {
+    const response = await serveSnapshot(request("catalog"), get, now);
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    assert.equal(response.headers.get("Server-Timing"), null);
+  }
 });
 test("missing, removed, expired, unavailable and corrupt responses do not become empty snapshots", async () => {
   const { get, catalog, objects, entry } = store();
