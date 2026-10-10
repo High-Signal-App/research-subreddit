@@ -23,7 +23,7 @@ test("snapshot entry point ships its controller without copying private archive 
   assert.match(home, /src="\/snapshots\/home.mjs"/);
   assert.match(home, /id="lookup"[^>]*data-app-health-event="snapshot_lookup_submitted"/);
   assert.match(home, /src="\/app-health-log\.js"/);
-  assert.match(home, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/);
+  assert.match(home, /https:\/\/health\.sassmaker\.com\/tracker\.js" data-vitals[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/);
   const trackerKey = home.match(/https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-key="(ahk_pub_[A-Za-z0-9_-]+)"/)?.[1];
   const loggerSource = readFileSync(join(DIST, "app-health-log.js"), "utf8");
   const loggerKey = loggerSource.match(/var KEY = '(ahk_pub_[A-Za-z0-9_-]+)'/)?.[1];
@@ -44,7 +44,7 @@ test("snapshot entry point ships its controller without copying private archive 
   const reader = readFileSync(join(DIST, "snapshots", "index.html"), "utf8");
   assert.match(reader, /src="\/snapshots\/app\.mjs"/);
   assert.match(reader, /src="\/app-health-log\.js"/);
-  assert.match(reader, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-identity="session"/);
+  assert.match(reader, /https:\/\/health\.sassmaker\.com\/tracker\.js" data-vitals[^>]*data-identity="session"/);
   const readerTrackerKey = reader.match(/https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-key="(ahk_pub_[A-Za-z0-9_-]+)"/)?.[1];
   assert.equal(readerTrackerKey, trackerKey, "daily reader must reuse the homepage's origin-scoped browser key");
   assert.match(reader, /<button id="share" data-app-health-event="snapshot_link_copy_clicked">/);
@@ -114,7 +114,7 @@ test("the search runtime is published and wired into every community page", { sk
     assert.match(page, /project-strip\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="dark"/);
     assert.match(page, /ai-chat-footer\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="dark"[^>]*data-surface="web"[^>]*data-capture="false"/);
     assert.equal((page.match(/<fleet-footer-extension\b/g) || []).length, 1, `r/${name} must have exactly one shared footer host`);
-    assert.match(page, /https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/, `r/${name} is missing the App Health visit tracker`);
+    assert.match(page, /https:\/\/health\.sassmaker\.com\/tracker\.js" data-vitals[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/, `r/${name} is missing the App Health visit tracker`);
     assert.match(page, /<script type="module" src="\/assets\/browser\/search-client\.mjs"><\/script>/, `r/${name} is missing the search controller`);
   }
   const logger = readFileSync(join(DIST, "app-health-log.js"), "utf8");
@@ -127,7 +127,7 @@ test("the search runtime is published and wired into every community page", { sk
 test("the footer publishes only its allowlisted art and local Geist font assets", { skip }, () => {
   const art = readFileSync(join(DIST, "footer-art", "reddit-insights.webp"));
   const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
-  assert.equal(sha256(art), "bf2ac20dedbae952868f879468c851773f0dc40291a43376990f3608fe1f950b");
+  assert.equal(sha256(art), "a840ec6a24063f42aab86f179a79961bf7c95ae1526d9dcb84aabcbb025ab09a");
   const artProvenance = JSON.parse(readFileSync(join(DIST, "footer-art", "reddit-insights.provenance.json"), "utf8"));
   assert.equal(artProvenance.publicIntended, true);
   assert.equal(artProvenance.originalSha256, "abfe1e2b062823b060dba5adb175137a1baca6ff7a7301ebcc612d5d06e604e7");

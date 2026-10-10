@@ -41,6 +41,19 @@ export async function readBounded(stream, limit = MAX_BYTES) {
 
 /** get(key) returns a byte stream or null; only catalogued keys can be requested. */
 export async function serveSnapshot(request, get, now = Date.now()) {
+  const started = performance.now();
+  let storageMs = 0;
+  const readStorage = async (key, limit) => {
+    const start = performance.now();
+    const stream = await get(key);
+    const bytes = stream ? await readBounded(stream, limit) : null;
+    storageMs += performance.now() - start;
+    return bytes;
+  };
+  const success = response => {
+    response.headers.set("Server-Timing", `storage;dur=${Math.round(storageMs)}, total;dur=${Math.round(performance.now() - started)}`);
+    return response;
+  };
   if (request.method !== "GET") return fail("method", "Use GET to read a snapshot.", 405);
   const url = new URL(request.url);
   if (!url.pathname.startsWith(BASE)) return fail("missing", "Snapshot route not found.", 404);
@@ -50,11 +63,11 @@ export async function serveSnapshot(request, get, now = Date.now()) {
   if (version !== null && !VERSION_PATTERN.test(version)) return fail("invalid", "Choose a valid snapshot version.", 400);
   if (!get) return fail("unavailable", "Snapshot storage is unavailable. Please try again later.", 503);
   try {
-    const catalogStream = await get("index.json");
-    if (!catalogStream) return fail("unavailable", "No snapshot catalog is available yet.", 503);
-    const catalog = JSON.parse(new TextDecoder().decode(await readBounded(catalogStream, 4 * 1024 * 1024)));
+    const catalogBytes = await readStorage("index.json", 4 * 1024 * 1024);
+    if (!catalogBytes) return fail("unavailable", "No snapshot catalog is available yet.", 503);
+    const catalog = JSON.parse(new TextDecoder().decode(catalogBytes));
     if (catalog.schema !== "reddit-insights.catalog.v1" || !Array.isArray(catalog.entries)) throw new Error("Invalid catalog");
-    if (route === "catalog") return json({ schema: catalog.schema, generatedAt: catalog.generatedAt, entries: catalog.entries.map(publicEntry) });
+    if (route === "catalog") return success(Response.json({ schema: catalog.schema, generatedAt: catalog.generatedAt, entries: catalog.entries.map(publicEntry) }, { headers: { ...headers, "Cache-Control": "public, max-age=60, s-maxage=300" } }));
     const [date, subreddit] = route.split("/");
     const run = url.searchParams.get("run"), revision = url.searchParams.get("revision");
     const entries = catalog.entries.filter(entry => entry.date === date && entry.subreddit.toLowerCase() === subreddit.toLowerCase());
@@ -65,9 +78,8 @@ export async function serveSnapshot(request, get, now = Date.now()) {
     if (!(Date.parse(entry.expiresAt) > now)) return fail("expired", "This export has expired. It needs to be refreshed from the archive.", 410);
     const expectedKey = `snapshots/${entry.date}/${entry.subreddit}/${entry.source.run}-${entry.source.revision}.json.gz`;
     if (entry.key !== expectedKey || !/^[a-f0-9]{64}$/.test(entry.source.revision) || !/^\d+$/.test(entry.source.run)) throw new Error("Invalid export key");
-    const stream = await get(entry.key);
-    if (!stream) return fail("unavailable", "The selected snapshot is temporarily unavailable.", 503);
-    const compressed = await readBounded(stream);
+    const compressed = await readStorage(entry.key);
+    if (!compressed) return fail("unavailable", "The selected snapshot is temporarily unavailable.", 503);
     const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", compressed)), byte => byte.toString(16).padStart(2, "0")).join("");
     if (compressed.length !== entry.bytes || digest !== entry.sha256) throw new Error("Snapshot checksum mismatch");
     const decoded = await readBounded(new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip")));
@@ -75,10 +87,10 @@ export async function serveSnapshot(request, get, now = Date.now()) {
     if (snapshot.schema !== "reddit-insights.snapshot.v1" || snapshot.date !== entry.date || snapshot.subreddit !== entry.subreddit || JSON.stringify(snapshot.source) !== JSON.stringify(entry.source) || snapshot.posts.length !== entry.coverage.posts || snapshot.comments.length !== entry.coverage.comments) throw new Error("Snapshot identity mismatch");
     const format = url.searchParams.get("format") || "json";
     if (!["json", "posts.csv", "comments.csv"].includes(format)) return fail("invalid", "Choose JSON, posts.csv or comments.csv.", 400);
-    if (format === "json" && !url.searchParams.has("download")) return json({ ...snapshot, expiresAt: entry.expiresAt });
+    if (format === "json" && !url.searchParams.has("download")) return success(json({ ...snapshot, expiresAt: entry.expiresAt }));
     const filename = `${entry.subreddit}-${date}-${entry.source.run}-${format === "json" ? "snapshot.json" : format}`;
     const body = format === "json" ? JSON.stringify({ ...snapshot, expiresAt: entry.expiresAt }, null, 2) : csv(snapshot[format.split(".")[0]], format === "posts.csv" ? POST_CSV : COMMENT_CSV, snapshot);
-    return new Response(body, { headers: { ...headers, "Content-Type": format === "json" ? "application/json; charset=utf-8" : "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${filename}"` } });
+    return success(new Response(body, { headers: { ...headers, "Content-Type": format === "json" ? "application/json; charset=utf-8" : "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${filename}"` } }));
   } catch {
     return fail("unavailable", "Snapshot data could not be verified or storage is unavailable.", 503);
   }

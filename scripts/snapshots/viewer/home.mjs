@@ -120,7 +120,7 @@ async function init() {
   $("retry").hidden = true;
   $("home-community").disabled = true; $("home-date").disabled = true;
   try {
-    const response = await fetch("/api/snapshots/catalog", { cache: "no-store" });
+    const response = await fetch("/api/snapshots/catalog");
     const data = await response.json();
     if (token !== generation) return;
     if (!response.ok || !Array.isArray(data.entries)) throw new Error(data.message || "The collection catalog is unavailable.");
