@@ -30,7 +30,7 @@ test("snapshot entry point ships its controller without copying private archive 
   assert.ok(trackerKey && loggerKey, "homepage tracker and browser logger must both carry a public key");
   assert.equal(loggerKey, trackerKey, "browser logs must use the existing tracker key scoped to this product origin");
   assert.match(home, /<footer[^>]*data-fleet-footer="studio"[^>]*data-catalog-id="reddit-insights"/);
-  assert.match(home, /<link rel="stylesheet" href="\/footer\.css"><script type="module" src="\/footer\.js"><\/script>/);
+  assert.match(home, /<link rel="stylesheet" href="\/footer\.css">(?:<style>[^<]*<\/style>)?<script type="module" src="\/footer\.js"><\/script>/);
   assert.equal((home.match(/<studio-footer\b/g) || []).length, 1, "Snapshot Studio must have exactly one footer");
   assert.match(home, /id="studio-feedback-form"|feedback/i);
   assert.match(home, /subscribe/i);
@@ -103,7 +103,7 @@ test("the search runtime is published and wired into every community page", { sk
     assert.match(page, /data-app-health-event="source_thread_opened"/, `r/${name} is missing source-thread event wiring`);
     assert.match(page, /research_view_changed/, `r/${name} is missing community/research-window event wiring`);
     assert.match(page, /<footer[^>]*data-fleet-footer="studio"[^>]*data-catalog-id="reddit-insights"/, `r/${name} is missing the shared footer`);
-    assert.match(page, /<link rel="stylesheet" href="\/footer\.css"><script type="module" src="\/footer\.js"><\/script>/, `r/${name} is missing the footer assets`);
+    assert.match(page, /<link rel="stylesheet" href="\/footer\.css">(?:<style>[^<]*<\/style>)?<script type="module" src="\/footer\.js"><\/script>/, `r/${name} is missing the footer assets`);
     assert.match(page, /Ranked Reddit evidence only\. HiSignal must corroborate candidates across sources before publication\./, `r/${name} lost its corroboration disclosure`);
     assert.match(page, /Search this community’s posts/);
     assert.match(page, /href="https:\/\/github\.com\/High-Signal-App\/research-subreddit"/);
