@@ -130,3 +130,24 @@ test("Pages adapter fails explicitly without a binding and uses only the derivat
   const keys = []; const response = await onRequest({ request: request("catalog"), env: { SNAPSHOT_EXPORTS: { get: async key => { keys.push(key); return null; } } } });
   assert.equal(response.status, 503); assert.deepEqual(keys, ["reddit-insights/exports/v1/index.json"]);
 });
+test("Pages adapter serves the catalog from the colo cache after the first read", async t => {
+  const { catalog } = store();
+  const entries = new Map(); let reads = 0; const pending = [];
+  const original = globalThis.caches;
+  globalThis.caches = { default: { match: async key => entries.get(key.url)?.clone(), put: async (key, value) => { entries.set(key.url, value); } } };
+  t.after(() => { globalThis.caches = original; });
+  const env = { SNAPSHOT_EXPORTS: { get: async () => { reads++; return { body: new Blob([JSON.stringify(catalog)]).stream() }; } } };
+  const context = suffix => ({ request: request(suffix), env, waitUntil: promise => pending.push(promise) });
+  const miss = await onRequest(context("catalog"));
+  await Promise.all(pending);
+  assert.equal(miss.status, 200);
+  assert.match(miss.headers.get("Server-Timing"), /^storage;dur=\d+, total;dur=\d+, cache;desc="MISS"$/);
+  const hit = await onRequest(context("catalog"));
+  assert.equal(hit.status, 200); assert.equal(reads, 1);
+  assert.equal(hit.headers.get("Server-Timing"), 'cache;desc="HIT"');
+  assert.equal(hit.headers.get("Cache-Control"), "public, max-age=60, s-maxage=300");
+  assert.deepEqual((await hit.json()).entries.length, catalog.entries.length);
+  await onRequest(context("catalog?v=abc"));
+  await onRequest(context("2026-10-01/cloud"));
+  assert.equal(entries.size, 1, "only the bare catalog URL is cached");
+});
