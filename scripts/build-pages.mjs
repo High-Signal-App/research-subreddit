@@ -5,6 +5,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync,
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderStudioFooterHtml } from "@saas-maker/ui/footer-html";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DISPLAY_DIR = join(ROOT, "data", "reddit-display");
@@ -14,15 +15,29 @@ const ROSTER_FILE = join(ROOT, "config", "community-roster.json");
 const PORT = 17424;
 const ORIGIN = process.env.PUBLIC_ORIGIN || "https://reddit-insights.highsignal.app";
 const SOCIAL_IMAGE = `${ORIGIN}/social-card.png`;
-const footerCapture = theme => `<saas-maker-newsletter-capture slot="capture" layout="compact" integrated catalog-id="reddit-insights" product-name="Reddit Insights" kind="newsletter" source="footer" privacy-url="/privacy/" theme="${theme}"></saas-maker-newsletter-capture>`;
-const footerScripts = theme => `<script src="/app-health-log.js" defer></script><script defer src="https://health.sassmaker.com/tracker.js" data-vitals data-key="ahk_pub_5fd468bae12640af79faa6aa53f76cc7e453914551888aed55e73f0a7d762417" data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110" data-identity="session" data-endpoint="https://ingest.sassmaker.com/v1/browser"></script><script type="module" src="https://sassmaker.com/newsletter-capture.js?v=precise-b0adaa67"></script><script src="https://sassmaker.com/project-strip.js?v=precise-b0adaa67" data-project="reddit-insights" data-host-only="true" data-theme="${theme}" crossorigin="anonymous" defer></script><script src="https://sassmaker.com/ai-chat-footer.js?v=precise-b0adaa67" data-name="Reddit Insights" data-project="reddit-insights" data-host-only="true" data-theme="${theme}" data-surface="web" data-capture="false" crossorigin="anonymous" defer></script>`;
+const appHealthScripts = `<script src="/app-health-log.js" defer></script><script defer src="https://health.sassmaker.com/tracker.js" data-vitals data-key="ahk_pub_5fd468bae12640af79faa6aa53f76cc7e453914551888aed55e73f0a7d762417" data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110" data-identity="session" data-endpoint="https://ingest.sassmaker.com/v1/browser"></script>`;
+// The page's own unlayered element rules (nav, h2, a, footer...) would beat the library's layered CSS.
+// revert-layer inside the footer drops those page rules so the library styling applies unchanged.
+const footerHead = `<link rel="stylesheet" href="/footer.css"><style>studio-footer{--font-display:inherit;--font-text:inherit;--font-sans:inherit}studio-footer *:not(#footer-scope){all:revert-layer}</style><script type="module" src="/footer.js"></script>`;
 
-const newsletterScriptMarker = '<script type="module" src="https://sassmaker.com/newsletter-capture.js?v=precise-b0adaa67">';
-const newsletterScriptIndex = footerScripts('light').indexOf(newsletterScriptMarker);
-if (newsletterScriptIndex < 0) throw new Error("Could not locate the shared newsletter script marker to derive App Health scripts.");
-const appHealthScripts = footerScripts('light').slice(0, newsletterScriptIndex);
-
-const footerExtension = ({ theme, nativeFont, cta, navigation, capture = true }) => `<footer class="reddit-insights-footer" aria-label="Reddit Insights footer"><fleet-footer-extension data-fleet-footer-project="reddit-insights" product-name="Reddit Insights" art-src="/footer-art/reddit-insights.webp" art-alt="Reddit Insights: A community research bulletin board centers one unlettered day folder with a source-linked discussion card inside its boundary. Separate community drawers and empty unobserved-day slots make captured scope visible." art-width="2172" art-height="724" art-position="50% 50%" art-credit="Original illustration for Reddit Insights" surface="web" theme="${theme}" font-base="/fonts/fleet-footer-precise-v1/" signature-font="inherit" style="font-family: ${nativeFont};"><a slot="cta" data-fleet-footer-cta href="${cta.href}">${cta.label}</a><nav slot="navigation" aria-label="Reddit Insights footer">${navigation}</nav>${capture ? footerCapture(theme) : ''}</fleet-footer-extension></footer>`;
+const footerArt = {
+  src: "/footer-art/reddit-insights.webp",
+  alt: "Reddit Insights: A community research bulletin board centers one unlettered day folder with a source-linked discussion card inside its boundary. Separate community drawers and empty unobserved-day slots make captured scope visible.",
+  position: "50% 50%",
+};
+// Library StudioFooter (framework-free, prerendered): feedback, subscribe, art and studio links come from the library.
+const studioFooter = ({ theme, summary, links }) => `<studio-footer${theme ? ` data-theme="${theme}"` : ""}>${renderStudioFooterHtml({
+  product: "Reddit Insights",
+  url: ORIGIN,
+  catalogId: "reddit-insights",
+  capture: "newsletter",
+  variant: "studio",
+  artMode: "panel",
+  privacyUrl: "/privacy/",
+  summary,
+  art: footerArt,
+  groups: [{ title: "Pages", links }],
+})}</studio-footer>`;
 
 // The studio renderer opens its main column with this section; the search
 // panel is injected directly above it so it is the first thing in <main>.
@@ -40,12 +55,6 @@ const searchStyles = `<style>
   #post-search button{background:var(--cobalt);color:var(--ink);border:0;border-radius:var(--radius-control);padding:10px 20px;font:inherit;font-size:var(--text-control);font-weight:600;cursor:pointer}
   #post-search-status{color:var(--quiet);font-size:var(--text-analytical);margin:12px 0 0}
   #post-search-results{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px;max-height:32rem;overflow-y:auto}
-  footer.reddit-insights-footer{display:block;width:100%;max-width:none;margin:0;padding:0;border:0;color:inherit}
-  .research-footer-native{display:grid;gap:10px;min-width:0}
-  .research-footer-native p{max-width:62ch;margin:0;color:var(--quiet)}
-  .research-footer-native .research-footer-links{display:flex;flex-wrap:wrap;gap:8px 18px}
-  .research-footer-native a{min-height:44px;display:inline-flex;align-items:center;color:var(--cyan);text-underline-offset:3px}
-  @media(max-width:700px){.research-footer-native .research-footer-links{display:grid;gap:0}}
   .post-search-hit{border-top:1px solid var(--rule);padding-top:10px}
   .post-search-hit a{color:var(--cyan);text-decoration:none;font-weight:600;font-size:var(--text-body)}
   .post-search-hit a:hover{text-decoration:underline}
@@ -99,14 +108,22 @@ function staticHtml(html, community) {
     /\bdata-app-health-event=/.test(anchor) ? anchor : anchor.replace(/>$/, ` data-app-health-event="source_thread_opened">`),
   );
   if (!withInstrumentedSources.includes('<footer class="studio-footer">')) throw new Error("Could not locate the research footer for the consented capture form.");
-  const nativeFooter = `<div class="research-footer-native"><strong>Reddit Insights · Top-content Observatory</strong><p>Ranked Reddit evidence only. HiSignal must corroborate candidates across sources before publication.</p><div class="research-footer-links"><a href="/">Snapshot Studio</a><a href="#post-search">Search this community’s posts</a><a href="/privacy/">Privacy</a><a class="source-link" href="https://github.com/High-Signal-App/research-subreddit" target="_blank" rel="noopener noreferrer" aria-label="Reddit Insights · r/${community} — source on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>`;
-  const cFooter = footerExtension({ theme: "dark", nativeFont: "Arial Black, Arial, Helvetica, sans-serif", cta: { href: "#post-search", label: "Search this community’s posts →" }, navigation: nativeFooter });
+  const cFooter = studioFooter({
+    theme: "ink",
+    summary: "Ranked Reddit evidence only. HiSignal must corroborate candidates across sources before publication.",
+    links: [
+      { label: "Snapshot Studio", href: "/" },
+      { label: "Search this community’s posts", href: "#post-search" },
+      { label: "Privacy", href: "/privacy/" },
+      { label: "Source on GitHub", href: "https://github.com/High-Signal-App/research-subreddit" },
+    ],
+  });
   return withInstrumentedSources
     .replace(dynamicNavigation, staticNavigation)
-    .replace("</head>", `${metadata}${searchStyles}</head>`)
+    .replace("</head>", `${metadata}${searchStyles}${footerHead}</head>`)
     .replace(SEARCH_ANCHOR, `<main>${searchSection(community)}${SEARCH_ANCHOR_TAIL}`)
     .replace(/<footer class="studio-footer">[\s\S]*?<\/footer><\/div>/, `</div>${cFooter}`)
-    .replace("</body>", `<script type="module" src="/assets/browser/search-client.mjs"></script>${footerScripts("dark")}</body>`);
+    .replace("</body>", `<script type="module" src="/assets/browser/search-client.mjs"></script>${appHealthScripts}</body>`);
 }
 
 async function waitForServer() {
@@ -128,10 +145,8 @@ try {
   for (const file of ["reddit-insights.webp", "reddit-insights.provenance.json"]) {
     copyFileSync(join(ROOT, "assets", "footer-art", file), join(DIST_DIR, "footer-art", file));
   }
-  const footerFontDir = join(DIST_DIR, "fonts", "fleet-footer-precise-v1");
-  mkdirSync(footerFontDir, { recursive: true });
-  for (const file of ["geist.woff2", "geistmono.woff2", "geist-OFL.txt", "geistmono-OFL.txt", "provenance.json"]) {
-    copyFileSync(join(ROOT, "assets", "fonts", "fleet-footer-precise-v1", file), join(footerFontDir, file));
+  for (const file of ["footer.css", "footer.js"]) {
+    copyFileSync(join(ROOT, "node_modules", "@saas-maker", "ui", file), join(DIST_DIR, file));
   }
   server = spawn(process.execPath, ["scripts/reddit-memory-ui.mjs", defaultCommunity], {
     cwd: ROOT,
@@ -162,11 +177,18 @@ try {
   const readerPath = join(DIST_DIR, "snapshots", "index.html");
   const readerHtml = readFileSync(readerPath, "utf8").replace("</body>", `${appHealthScripts}</body>`);
   writeFileSync(readerPath, readerHtml);
-  const homeNative = `<div class="research-footer-native"><a class="brand" href="/">Reddit Insights</a><p>Captured records, with their limits intact.<br>Source posts remain on Reddit. Retained comments are filtered.</p><div class="research-footer-links"><a href="#how">How it works</a><a href="/privacy/">Privacy</a></div></div>`;
-  const homeFooter = footerExtension({ theme: "light", nativeFont: "Archivo, Arial, sans-serif", cta: { href: "#lookup", label: "Find a snapshot ↗" }, navigation: homeNative });
+  const homeFooter = studioFooter({
+    summary: "Captured records, with their limits intact. Source posts remain on Reddit. Retained comments are filtered.",
+    links: [
+      { label: "How it works", href: "#how" },
+      { label: "Find a snapshot", href: "#lookup" },
+      { label: "Privacy", href: "/privacy/" },
+    ],
+  });
   const homeHtml = readFileSync(join(ROOT, "scripts", "snapshots", "viewer", "home.html"), "utf8")
     .replace(/<footer>[\s\S]*?<\/footer>/, homeFooter)
-    .replace("</body>", `${footerScripts("light")}</body>`);
+    .replace("</head>", `${footerHead}</head>`)
+    .replace("</body>", `${appHealthScripts}</body>`);
   writeFileSync(join(DIST_DIR, "index.html"), homeHtml);
   writeFileSync(join(DIST_DIR, "_redirects"), "/r/:community/:date/:version/ /snapshots/ 200\n/r/:community/:date/ /snapshots/ 200\n");
   // Missing/unpublished communities must not masquerade as the default corpus.
