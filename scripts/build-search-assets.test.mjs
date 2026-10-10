@@ -29,16 +29,12 @@ test("snapshot entry point ships its controller without copying private archive 
   const loggerKey = loggerSource.match(/var KEY = '(ahk_pub_[A-Za-z0-9_-]+)'/)?.[1];
   assert.ok(trackerKey && loggerKey, "homepage tracker and browser logger must both carry a public key");
   assert.equal(loggerKey, trackerKey, "browser logs must use the existing tracker key scoped to this product origin");
-  assert.match(home, /<footer class="reddit-insights-footer" aria-label="Reddit Insights footer"><fleet-footer-extension[^>]*data-fleet-footer-project="reddit-insights"[^>]*theme="light"[^>]*font-base="\/fonts\/fleet-footer-precise-v1\/"/);
-  assert.match(home, /<saas-maker-newsletter-capture slot="capture" layout="compact" integrated catalog-id="reddit-insights"[^>]*theme="light"/);
-  for (const sharedScript of ["newsletter-capture.js", "project-strip.js", "ai-chat-footer.js"]) {
-    assert.equal(home.split(`https://sassmaker.com/${sharedScript}`).length - 1, 1, `${sharedScript} must load once on the homepage`);
-  }
-  assert.match(home, /newsletter-capture\.js\?v=precise-b0adaa67/);
-  assert.match(home, /project-strip\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="light"/);
-  assert.match(home, /ai-chat-footer\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="light"[^>]*data-surface="web"[^>]*data-capture="false"/);
-  assert.equal((home.match(/<fleet-footer-extension\b/g) || []).length, 1, "Snapshot Studio must have exactly one shared footer host");
-  assert.match(home, /<a slot="cta" data-fleet-footer-cta href="#lookup">/);
+  assert.match(home, /<footer[^>]*data-fleet-footer="studio"[^>]*data-catalog-id="reddit-insights"/);
+  assert.match(home, /<link rel="stylesheet" href="\/footer\.css"><script type="module" src="\/footer\.js"><\/script>/);
+  assert.equal((home.match(/<studio-footer\b/g) || []).length, 1, "Snapshot Studio must have exactly one footer");
+  assert.match(home, /id="studio-feedback-form"|feedback/i);
+  assert.match(home, /subscribe/i);
+  assert.doesNotMatch(home, /sassmaker\.com\/(?:newsletter-capture|project-strip|ai-chat-footer|feedback-launcher)\.js|fleet-footer-extension/);
   assert.match(home, /Source posts remain on Reddit\. Retained comments are filtered\./);
   assert.doesNotMatch(home, /What is an AI agent|350.*retained comments|99 communities/);
   const reader = readFileSync(join(DIST, "snapshots", "index.html"), "utf8");
@@ -48,7 +44,7 @@ test("snapshot entry point ships its controller without copying private archive 
   const readerTrackerKey = reader.match(/https:\/\/health\.sassmaker\.com\/tracker\.js[^>]*data-key="(ahk_pub_[A-Za-z0-9_-]+)"/)?.[1];
   assert.equal(readerTrackerKey, trackerKey, "daily reader must reuse the homepage's origin-scoped browser key");
   assert.match(reader, /<button id="share" data-app-health-event="snapshot_link_copy_clicked">/);
-  assert.doesNotMatch(reader, /fleet-footer-extension|newsletter-capture\.js|project-strip\.js|ai-chat-footer\.js/, "the daily reader remains outside this footer migration");
+  assert.doesNotMatch(reader, /studio-footer|fleet-footer-extension|newsletter-capture\.js|project-strip\.js|ai-chat-footer\.js/, "the daily reader remains outside the shared footer");
   for (const id of ["json-download", "posts-download", "comments-download"]) {
     assert.match(reader, new RegExp(`<a id="${id}" data-app-health-event="snapshot_download_clicked">`));
   }
@@ -106,14 +102,13 @@ test("the search runtime is published and wired into every community page", { sk
     assert.match(page, /data-app-health-event="post_search_submitted"/, `r/${name} is missing the privacy-safe post-search event`);
     assert.match(page, /data-app-health-event="source_thread_opened"/, `r/${name} is missing source-thread event wiring`);
     assert.match(page, /research_view_changed/, `r/${name} is missing community/research-window event wiring`);
-    assert.match(page, /<footer class="reddit-insights-footer" aria-label="Reddit Insights footer"><fleet-footer-extension[^>]*data-fleet-footer-project="reddit-insights"[^>]*theme="dark"/, `r/${name} is missing its shared footer host`);
-    assert.match(page, /saas-maker-newsletter-capture slot="capture" layout="compact" integrated catalog-id="reddit-insights"[^>]*theme="dark"/, `r/${name} is missing the consented footer capture`);
+    assert.match(page, /<footer[^>]*data-fleet-footer="studio"[^>]*data-catalog-id="reddit-insights"/, `r/${name} is missing the shared footer`);
+    assert.match(page, /<link rel="stylesheet" href="\/footer\.css"><script type="module" src="\/footer\.js"><\/script>/, `r/${name} is missing the footer assets`);
     assert.match(page, /Ranked Reddit evidence only\. HiSignal must corroborate candidates across sources before publication\./, `r/${name} lost its corroboration disclosure`);
     assert.match(page, /Search this community’s posts/);
-    assert.match(page, /href="https:\/\/github\.com\/High-Signal-App\/research-subreddit"[^>]*aria-label="Reddit Insights · r\//);
-    assert.match(page, /project-strip\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="dark"/);
-    assert.match(page, /ai-chat-footer\.js\?v=precise-b0adaa67[^>]*data-project="reddit-insights"[^>]*data-host-only="true"[^>]*data-theme="dark"[^>]*data-surface="web"[^>]*data-capture="false"/);
-    assert.equal((page.match(/<fleet-footer-extension\b/g) || []).length, 1, `r/${name} must have exactly one shared footer host`);
+    assert.match(page, /href="https:\/\/github\.com\/High-Signal-App\/research-subreddit"/);
+    assert.doesNotMatch(page, /sassmaker\.com\/(?:newsletter-capture|project-strip|ai-chat-footer|feedback-launcher)\.js|fleet-footer-extension/, `r/${name} still loads Precise footer scripts`);
+    assert.equal((page.match(/<studio-footer\b/g) || []).length, 1, `r/${name} must have exactly one footer`);
     assert.match(page, /https:\/\/health\.sassmaker\.com\/tracker\.js" data-vitals[^>]*data-project="app-import-2ebd840a2a927417ca16d9c9bd3fd3576a250cc317bc0b6f8a0ce9ec3d586110"/, `r/${name} is missing the App Health visit tracker`);
     assert.match(page, /<script type="module" src="\/assets\/browser\/search-client\.mjs"><\/script>/, `r/${name} is missing the search controller`);
   }
@@ -132,13 +127,7 @@ test("the footer publishes only its allowlisted art and local Geist font assets"
   assert.equal(artProvenance.publicIntended, true);
   assert.equal(artProvenance.originalSha256, "abfe1e2b062823b060dba5adb175137a1baca6ff7a7301ebcc612d5d06e604e7");
   assert.equal(artProvenance.derivativeSha256, sha256(art));
-  const fontDir = join(DIST, "fonts", "fleet-footer-precise-v1");
-  assert.equal(sha256(readFileSync(join(fontDir, "geist.woff2"))), "19f9c92546aa300c312235e3125af1b81394d8db9a4bc4a425cd5b641d2d54e1");
-  assert.equal(sha256(readFileSync(join(fontDir, "geistmono.woff2"))), "3f98383b122fe015a48536cd4a1cda855a201718923ffe74931a01597107b9b5");
-  for (const file of ["geist-OFL.txt", "geistmono-OFL.txt"]) assert.equal(sha256(readFileSync(join(fontDir, file))), "fb64c1011862d97fe49c633ad9180ffd80a61aab6ff220a2935704e8a0c3a7c4");
-  const fontProvenance = JSON.parse(readFileSync(join(fontDir, "provenance.json"), "utf8"));
-  assert.equal(fontProvenance.runtimePolicy, "Same-origin font-base is authored in the footer host. Actual browser font loading remains unverified.");
-  assert.equal(fontProvenance.fonts[0].upstreamLicenseSha256, "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f");
+  assert.ok(existsSync(join(DIST, "footer.css")) && existsSync(join(DIST, "footer.js")), "library footer assets must ship");
 });
 
 
