@@ -58,13 +58,25 @@ export async function refreshSourceExports(entries, manifestBytes, load, read, n
   const renewed = renewSource(entries, manifestBytes, now);
   if (!renewed) return rebuild();
   const prepared = [];
-  for (const entry of renewed) {
-    if (Date.parse(entry.storedAt) > now - RETOUCH_MS) continue;
-    const bytes = await read(entry);
-    if (bytes === null) return rebuild();
-    if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error("Existing derivative failed checksum verification");
-    entry.storedAt = new Date(now).toISOString();
-    prepared.push({ entry, bytes });
+  const aged = renewed.filter(entry => !(Date.parse(entry.storedAt) > now - RETOUCH_MS));
+  for (let start = 0; start < aged.length; start += 4) {
+    const batch = aged.slice(start, start + 4);
+    // Settle every read before rebuilding or cleaning the publication scratch directory.
+    const results = await Promise.allSettled(batch.map(entry => read(entry)));
+    const failed = results.find(result => result.status === "rejected");
+    if (failed) throw failed.reason;
+    let missing = false;
+    for (let index = 0; index < batch.length; index++) {
+      const bytes = results[index].value, entry = batch[index];
+      if (bytes === null) { missing = true; continue; }
+      if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error("Existing derivative failed checksum verification");
+    }
+    if (missing) return rebuild();
+    for (let index = 0; index < batch.length; index++) {
+      const entry = batch[index];
+      entry.storedAt = new Date(now).toISOString();
+      prepared.push({ entry, bytes: results[index].value });
+    }
   }
   return { entries: renewed, prepared };
 }
