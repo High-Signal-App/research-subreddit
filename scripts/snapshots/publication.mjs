@@ -50,11 +50,14 @@ export function renewSource(entries, manifestBytes, now = Date.now()) {
 }
 
 /** Expired derived objects can be rebuilt only from the verified source archive. */
-export async function refreshSourceExports(entries, manifestBytes, load, read, now = Date.now()) {
+export async function refreshSourceExports(entries, manifestBytes, load, read, now = Date.now(), { rebuildExisting = false } = {}) {
   const rebuild = async () => {
-    const prepared = prepareSnapshots(await load(), now);
+    const snapshots = await load(), prefix = archivePrefix(entries[0]), revision = sha256(manifestBytes);
+    if (!snapshots.length || snapshots.some(snapshot => archivePrefix(snapshot) !== prefix || snapshot.source.revision !== revision)) throw new Error("Rebuilt snapshots failed source verification");
+    const prepared = prepareSnapshots(snapshots, now);
     return { entries: prepared.map(item => item.entry), prepared };
   };
+  if (rebuildExisting) return rebuild();
   const renewed = renewSource(entries, manifestBytes, now);
   if (!renewed) return rebuild();
   const prepared = [];
@@ -69,7 +72,7 @@ export async function refreshSourceExports(entries, manifestBytes, load, read, n
     for (let index = 0; index < batch.length; index++) {
       const bytes = results[index].value, entry = batch[index];
       if (bytes === null) { missing = true; continue; }
-      if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error("Existing derivative failed checksum verification");
+      if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error(`Existing derivative failed checksum verification: ${entry.key}`);
     }
     if (missing) return rebuild();
     for (let index = 0; index < batch.length; index++) {

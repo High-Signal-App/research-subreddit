@@ -101,3 +101,20 @@ test("a missing object cannot mask concurrent permission or checksum failures", 
     async item => item.subreddit === "community_1" ? Buffer.from("corrupt") : null,
     Date.parse("2026-10-22T00:00:00Z")), /checksum verification/);
 });
+
+test("explicit recovery rebuilds from verified sources without trusting existing derivatives", async () => {
+  const manifest = Buffer.from(JSON.stringify({ objectPrefix: archivePrefix(entry) }));
+  const snapshot = { subreddit: entry.subreddit, date: entry.date, source: { ...source, revision: sha256(manifest) } };
+  const old = { ...entry, source: snapshot.source, storedAt: "2026-10-01T00:00:00Z" };
+  const now = Date.parse("2026-10-22T00:00:00Z"), options = { rebuildExisting: true };
+  const read = async () => { throw new Error("must not trust a previous derivative"); };
+  const refreshed = await refreshSourceExports([old], manifest, async () => [snapshot], read, now, options);
+  assert.equal(refreshed.prepared.length, 1);
+  assert.equal(refreshed.entries[0].sha256, sha256(refreshed.prepared[0].bytes));
+  assert.equal(refreshed.entries[0].source.revision, sha256(manifest));
+  assert.equal(old.storedAt, "2026-10-01T00:00:00Z");
+  await assert.rejects(refreshSourceExports([old], manifest, async () => { throw new Error("source unavailable"); }, read, now, options), /source unavailable/);
+  for (const snapshots of [[], [{ ...snapshot, source }], [{ ...snapshot, date: "2026-10-02" }]]) {
+    await assert.rejects(refreshSourceExports([old], manifest, async () => snapshots, read, now, options), /source verification/);
+  }
+});

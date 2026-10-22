@@ -8,19 +8,23 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { loadArchive, sha256 } from "./snapshots/archive.mjs";
 import { EXPORT_PREFIX, archivePrefix, prepareSnapshots, verifyCatalog, replaceSource, renewSource, refreshSourceExports, publishPrepared } from "./snapshots/publication.mjs";
+import { createWranglerRunner } from "./snapshots/wrangler-client.mjs";
 
 const exec = promisify(execFile);
 const { values } = parseArgs({ options: {
   "archive-dir": { type: "string", multiple: true }, "refresh-only": { type: "boolean", default: false },
+  "rebuild-existing": { type: "boolean", default: false },
   initialize: { type: "boolean", default: false }, bucket: { type: "string", default: "reddit-insights-archive" },
 } });
 if (!values["archive-dir"]?.length && !values["refresh-only"]) throw new Error("Provide --archive-dir or --refresh-only");
+if (values["rebuild-existing"] && !values["refresh-only"]) throw new Error("Rebuild requires an explicit refresh-only recovery");
 if (values.bucket !== "reddit-insights-archive") throw new Error("Publisher is scoped to the private Reddit Insights derivative bucket");
 const work = await mkdtemp(join(tmpdir(), "reddit-snapshot-publication-"));
 const now = Date.now();
 let serial = 0, uploads = 0;
+const runWrangler = createWranglerRunner(exec, work);
 async function wrangler(args) {
-  try { return await exec("npx", ["--yes", "wrangler@4.120.0", ...args], { cwd: work, maxBuffer: 1024 * 1024 }); }
+  try { return await runWrangler(args); }
   catch (error) { throw new Error(`Cloudflare operation failed: ${(error.stderr || error.stdout || error.message).slice(-2000)}`); }
 }
 async function get(bucket, key, path, allowMissing = false) {
@@ -68,7 +72,7 @@ try {
     const directory = join(work, "latest-archive"); await mkdir(directory);
     const manifest = await get("high-signal-reddit-archive", latest.objects.manifest, join(directory, "manifest.json"));
     const entries = catalog.entries.filter(entry => archivePrefix(entry) === latestPrefix);
-    if (!renewSource(entries, manifest, now)) {
+    if (values["rebuild-existing"] || !renewSource(entries, manifest, now)) {
       const items = prepareSnapshots(await downloadArchive(latestPrefix, directory, manifest), now);
       catalog = replaceSource(catalog, items); prepared.push(...items); updated.add(latestPrefix);
     }
@@ -87,7 +91,7 @@ try {
     const manifest = await get("high-signal-reddit-archive", `${prefix}/manifest.json`, join(directory, "manifest.json"));
     const refreshed = await refreshSourceExports(entries, manifest,
       () => downloadArchive(prefix, directory, manifest),
-      entry => get(values.bucket, EXPORT_PREFIX + entry.key, join(work, `retouch-${serial++}`), true), now);
+      entry => get(values.bucket, EXPORT_PREFIX + entry.key, join(work, `retouch-${serial++}`), true), now, { rebuildExisting: values["rebuild-existing"] });
     catalog.entries = [...catalog.entries.filter(entry => archivePrefix(entry) !== prefix), ...refreshed.entries];
     prepared.push(...refreshed.prepared);
   }
