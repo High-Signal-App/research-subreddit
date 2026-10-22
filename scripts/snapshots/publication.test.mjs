@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { gzipSync } from "node:zlib";
 import { sha256 } from "./archive.mjs";
-import { archivePrefix, renewSource, replaceSource, publishPrepared, EXPORT_PREFIX } from "./publication.mjs";
+import { archivePrefix, renewSource, replaceSource, refreshSourceExports, publishPrepared, EXPORT_PREFIX } from "./publication.mjs";
 
 const source = { run: "12", attempt: "1", revision: "a".repeat(64) };
 const bytes = gzipSync("{}");
@@ -33,4 +33,34 @@ test("catalog publication follows uploads and verification; either failure leave
   assert.deepEqual(writes, []);
   await publishPrepared(catalog, prepared, async key => { writes.push(key); }, async () => { writes.push("verified"); });
   assert.deepEqual(writes, [EXPORT_PREFIX + entry.key, "verified", EXPORT_PREFIX + "index.json"]);
+});
+
+test("a missing expired derivative is rebuilt from its authoritative archive instead of blocking refresh", async () => {
+  const now = Date.parse("2026-10-22T00:00:00Z");
+  const manifest = Buffer.from(JSON.stringify({ objectPrefix: archivePrefix(entry) }));
+  const snapshot = { subreddit: entry.subreddit, date: entry.date,
+    source: { ...source, revision: sha256(manifest) }, capturedAt: "2026-10-01T00:00:00Z" };
+  const expired = { ...entry, source: snapshot.source, storedAt: "2026-10-14T00:00:00Z" };
+  let loads = 0;
+  const refreshed = await refreshSourceExports([expired], manifest,
+    async () => { loads++; return [snapshot]; }, async () => null, now);
+  assert.equal(loads, 1);
+  assert.equal(refreshed.prepared.length, 1);
+  assert.equal(refreshed.entries[0].expiresAt, "2026-10-23T00:00:00.000Z");
+  assert.equal(refreshed.entries[0].source.revision, sha256(manifest));
+  assert.equal(refreshed.entries[0].storedAt, new Date(now).toISOString());
+  assert.equal(expired.storedAt, "2026-10-14T00:00:00Z");
+});
+
+test("refresh never turns permission failures, corrupt exports or unavailable archives into lease renewal", async () => {
+  const manifest = Buffer.from(JSON.stringify({ objectPrefix: archivePrefix(entry) }));
+  const old = { ...entry, source: { ...source, revision: sha256(manifest) }, storedAt: "2026-10-01T00:00:00Z" };
+  const now = Date.parse("2026-10-22T00:00:00Z");
+  const load = async () => { throw new Error("source unavailable"); };
+  await assert.rejects(refreshSourceExports([old], manifest, load,
+    async () => { throw new Error("permission denied"); }, now), /permission denied/);
+  await assert.rejects(refreshSourceExports([old], manifest, load,
+    async () => Buffer.from("corrupt"), now), /checksum verification/);
+  await assert.rejects(refreshSourceExports([old], manifest, load,
+    async () => null, now), /source unavailable/);
 });
