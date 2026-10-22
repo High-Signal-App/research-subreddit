@@ -63,4 +63,41 @@ test("refresh never turns permission failures, corrupt exports or unavailable ar
     async () => Buffer.from("corrupt"), now), /checksum verification/);
   await assert.rejects(refreshSourceExports([old], manifest, load,
     async () => null, now), /source unavailable/);
+  await assert.rejects(refreshSourceExports([{ ...old, storedAt: "invalid" }], manifest, load,
+    async () => Buffer.from("corrupt"), now), /checksum verification/);
+});
+
+test("aged derivative verification overlaps at most four reads and preserves catalog order", async () => {
+  const manifest = Buffer.from(JSON.stringify({ objectPrefix: archivePrefix(entry) }));
+  const old = Array.from({ length: 9 }, (_, index) => ({ ...entry, subreddit: `community_${index}`,
+    source: { ...source, revision: sha256(manifest) }, storedAt: "2026-10-01T00:00:00Z" }));
+  let active = 0, peak = 0, completed = 0;
+  const refreshed = await refreshSourceExports(old, manifest, async () => { throw new Error("unexpected rebuild"); },
+    async () => {
+      active++; peak = Math.max(peak, active);
+      await new Promise(resolve => setImmediate(resolve));
+      active--; completed++; return bytes;
+    }, Date.parse("2026-10-22T00:00:00Z"));
+  assert.equal(peak, 4);
+  assert.equal(active, 0);
+  assert.equal(completed, 9);
+  assert.deepEqual(refreshed.prepared.map(item => item.entry.subreddit), old.map(item => item.subreddit));
+  assert.ok(old.every(item => item.storedAt === "2026-10-01T00:00:00Z"));
+});
+
+test("a missing object cannot mask concurrent permission or checksum failures", async () => {
+  const manifest = Buffer.from(JSON.stringify({ objectPrefix: archivePrefix(entry) }));
+  const old = Array.from({ length: 4 }, (_, index) => ({ ...entry, subreddit: `community_${index}`,
+    source: { ...source, revision: sha256(manifest) }, storedAt: "2026-10-01T00:00:00Z" }));
+  let completed = 0;
+  const load = async () => { throw new Error("unexpected rebuild"); };
+  await assert.rejects(refreshSourceExports(old, manifest, load, async item => {
+    await new Promise(resolve => setImmediate(resolve)); completed++;
+    if (item.subreddit === "community_1") throw new Error("permission denied");
+    return null;
+  }, Date.parse("2026-10-22T00:00:00Z")), /permission denied/);
+  assert.equal(completed, 4);
+  await assert.rejects(refreshSourceExports(old, manifest, load,
+    async item => item.subreddit === "community_1" ? Buffer.from("corrupt") : null,
+    Date.parse("2026-10-22T00:00:00Z")), /checksum verification/);
 });
