@@ -7,7 +7,7 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { loadArchive, sha256 } from "./snapshots/archive.mjs";
-import { EXPORT_PREFIX, RETOUCH_MS, archivePrefix, prepareSnapshots, verifyCatalog, replaceSource, renewSource, publishPrepared } from "./snapshots/publication.mjs";
+import { EXPORT_PREFIX, archivePrefix, prepareSnapshots, verifyCatalog, replaceSource, renewSource, refreshSourceExports, publishPrepared } from "./snapshots/publication.mjs";
 
 const exec = promisify(execFile);
 const { values } = parseArgs({ options: {
@@ -85,22 +85,11 @@ try {
     await mkdir(directory);
     // A missing/unreadable source fails this publication; no lease is silently extended.
     const manifest = await get("high-signal-reddit-archive", `${prefix}/manifest.json`, join(directory, "manifest.json"));
-    const renewed = renewSource(entries, manifest, now);
-    if (!renewed) {
-      const items = prepareSnapshots(await downloadArchive(prefix, directory, manifest), now);
-      catalog = replaceSource(catalog, items); prepared.push(...items);
-    } else {
-      for (const entry of renewed) {
-        // Retouch active derivatives before the proposed seven-day lifecycle removes them.
-        if (!(Date.parse(entry.storedAt) > now - RETOUCH_MS)) {
-          const bytes = await get(values.bucket, EXPORT_PREFIX + entry.key, join(work, `retouch-${serial++}`));
-          if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error("Existing derivative failed checksum verification");
-          entry.storedAt = new Date(now).toISOString(); prepared.push({ entry, bytes });
-        }
-      }
-      const byKey = new Map(renewed.map(entry => [entry.key, entry]));
-      catalog.entries = catalog.entries.map(entry => byKey.get(entry.key) || entry);
-    }
+    const refreshed = await refreshSourceExports(entries, manifest,
+      () => downloadArchive(prefix, directory, manifest),
+      entry => get(values.bucket, EXPORT_PREFIX + entry.key, join(work, `retouch-${serial++}`), true), now);
+    catalog.entries = [...catalog.entries.filter(entry => archivePrefix(entry) !== prefix), ...refreshed.entries];
+    prepared.push(...refreshed.prepared);
   }
   catalog.generatedAt = new Date(now).toISOString();
   catalog.entries.sort((a, b) => b.date.localeCompare(a.date) || b.capturedAt.localeCompare(a.capturedAt) || a.subreddit.localeCompare(b.subreddit));

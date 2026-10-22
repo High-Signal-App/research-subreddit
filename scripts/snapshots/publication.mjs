@@ -49,6 +49,26 @@ export function renewSource(entries, manifestBytes, now = Date.now()) {
   return entries.map(entry => ({ ...entry, expiresAt: new Date(now + LEASE_MS).toISOString() }));
 }
 
+/** Expired derived objects can be rebuilt only from the verified source archive. */
+export async function refreshSourceExports(entries, manifestBytes, load, read, now = Date.now()) {
+  const rebuild = async () => {
+    const prepared = prepareSnapshots(await load(), now);
+    return { entries: prepared.map(item => item.entry), prepared };
+  };
+  const renewed = renewSource(entries, manifestBytes, now);
+  if (!renewed) return rebuild();
+  const prepared = [];
+  for (const entry of renewed) {
+    if (Date.parse(entry.storedAt) > now - RETOUCH_MS) continue;
+    const bytes = await read(entry);
+    if (bytes === null) return rebuild();
+    if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) throw new Error("Existing derivative failed checksum verification");
+    entry.storedAt = new Date(now).toISOString();
+    prepared.push({ entry, bytes });
+  }
+  return { entries: renewed, prepared };
+}
+
 /** Catalog is committed last; interrupted object uploads cannot switch readers. */
 export async function publishPrepared(catalog, prepared, put, verify) {
   verifyCatalog(catalog);
